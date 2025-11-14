@@ -2,9 +2,9 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { WiseChat } from './wisechat.entity';
-import { Message } from '../message/message.entity';
-import { Historial } from '../historial/historial.entity';
+import { WiseChat } from '../wise-chat/entities/wise-chat.entity';
+import { Message } from '../message/entities/message.entity';
+import { Historial } from '../historial/entities/historial.entity';
 import { firstValueFrom } from 'rxjs';
 
 @Injectable()
