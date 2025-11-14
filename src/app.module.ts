@@ -13,7 +13,7 @@ import { Notification } from './notification/entities/notification.entity';
       host: 'localhost',
       port: 5432,
       username: 'postgres', 
-      password: '1234', 
+      password: '250622', 
       database: 'mind_connectIA',
       entities: [User, Message, WiseChat, Historial, Notification],
       synchronize: true, 

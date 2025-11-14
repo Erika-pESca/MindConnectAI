@@ -7,8 +7,14 @@
  import { WiseChatService } from './wise-chat.service';
  import { WiseChatController } from './wise-chat.controller';
 
+ import { ConfigModule } from '@nestjs/config';
+
  @Module({
-   imports: [TypeOrmModule.forFeature([WiseChat, Message, Historial]), HttpModule],
+   imports: [
+     TypeOrmModule.forFeature([WiseChat, Message, Historial]),
+     HttpModule,
+     ConfigModule,
+   ],
    providers: [WiseChatService],
    controllers: [WiseChatController],
  })
