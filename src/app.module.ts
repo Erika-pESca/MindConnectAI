@@ -22,4 +22,8 @@ import { Notification } from './notification/entities/notification.entity';
     TypeOrmModule.forFeature([User, Message, WiseChat, Historial, Notification]),
   ],
 })
-export class AppModule {}
+export class AppModule {
+   constructor() {
+    console.log('➡️ Base de datos conectada correctamente ✔️');
+   }
+}
