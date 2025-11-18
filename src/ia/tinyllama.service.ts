@@ -64,4 +64,53 @@ export class TinyLlamaService {
       };
     }
   }
+
+  async analyzeAndRespond(userMessage: string): Promise<{ sentiment: string; response: string }> {
+    const prompt = `
+      Analiza el sentimiento del siguiente mensaje de un usuario que busca apoyo emocional
+      y luego genera una respuesta empática y útil.
+      El sentimiento debe ser uno de: 'positivo', 'negativo', 'neutro', 'urgente'.
+      Devuelve tu análisis únicamente en formato JSON con las claves "sentiment" y "response".
+
+      Mensaje del usuario: "${userMessage}"
+
+      JSON de respuesta:
+    `;
+
+    // Suponiendo que tienes un método `generate` que envía el prompt al modelo
+    const modelOutput = await this.generate(prompt);
+
+    try {
+      // El modelo debería devolver un string JSON, así que lo parseamos
+      const parsedOutput = JSON.parse(modelOutput);
+      return {
+        sentiment: parsedOutput.sentiment || 'desconocido',
+        response: parsedOutput.response || 'No he podido procesar tu mensaje, intenta de nuevo.',
+      };
+    } catch (error) {
+      console.error('Error al parsear la respuesta de la IA:', modelOutput);
+      // Fallback por si la IA no devuelve un JSON válido
+      return {
+        sentiment: 'desconocido',
+        response: 'Estoy teniendo problemas para responder en este momento. Por favor, intenta más tarde.',
+      };
+    }
+  }
+
+  // Un método de ejemplo para `generate`
+  private async generate(prompt: string): Promise<string> {
+    // Aquí iría tu lógica para hacer la llamada a la API de TinyLlama
+    // por ejemplo, usando fetch o una librería como axios.
+    // const response = await fetch('URL_DE_TINYLLAMA', { ... });
+    // const data = await response.json();
+    // return data.choices[0].text;
+    
+    // Esto es un mock para el ejemplo
+    console.log("Enviando prompt a TinyLlama:", prompt);
+    const mockResponse = {
+        sentiment: "negativo",
+        response: "Lamento escuchar que te sientes así. Recuerda que está bien no estar bien. ¿Hay algo específico sobre lo que te gustaría hablar?"
+    };
+    return JSON.stringify(mockResponse);
+  }
 }

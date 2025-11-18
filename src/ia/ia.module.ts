@@ -5,6 +5,6 @@ import { IaService } from './ia.service';
 
 @Module({
   providers: [HuggingFaceService, TinyLlamaService, IaService],
-  exports: [IaService],
+  exports: [TinyLlamaService, IaService],
 })
 export class IaModule {}
