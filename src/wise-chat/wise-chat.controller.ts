@@ -24,6 +24,14 @@ export class WiseChatController {
     return await this.chatService.crearChat(userId, dto);
   }
 
+  // Obtener todos los chats del usuario actual
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async obtenerMisChats(@Req() req) {
+    const userId = req.user.id;
+    return this.chatService.findAllByUser(userId);
+  }
+
   // Obtener un chat por ID
   @Get(':id')
   async obtenerChat(@Param('id') id: string) {

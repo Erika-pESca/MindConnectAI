@@ -77,6 +77,22 @@ export class WiseChatService {
     return chat;
   }
 
+  /**
+   * Obtener todos los chats de un usuario específico
+   */
+  async findAllByUser(userId: number) {
+    return this.wiseChatRepository.find({
+      where: {
+        historial: {
+          user: { id: userId },
+        },
+      },
+      order: {
+        fecha_creacion: 'DESC', // Los más recientes primero
+      },
+    });
+  }
+
   async processMessageWithIA(data: { message: string; userId: number }) {
     // Aquí puedes guardar el mensaje del usuario en la base de datos si quieres
     // await this.messageService.create({ ... });

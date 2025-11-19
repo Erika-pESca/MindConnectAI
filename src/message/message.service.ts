@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -15,6 +15,8 @@ import { IaResponse } from '../ia/dto/ia-response.interface';
 
 @Injectable()
 export class MessageService {
+  private readonly logger = new Logger(MessageService.name);
+
   constructor(
     @InjectRepository(Message)
     private readonly messageRepo: Repository<Message>,
@@ -41,6 +43,8 @@ export class MessageService {
     // 2. Validar que existan
     if (!chat) throw new NotFoundException('Chat no encontrado');
     if (!user) throw new NotFoundException('Usuario no encontrado');
+
+    this.logger.log(`📝 Creando mensaje para Chat ID: ${chatId}, User ID: ${userId}`);
 
     // 3. Analizar sentimiento y generar respuesta con IA en un solo paso
     const iaResult: IaResponse =
@@ -82,16 +86,90 @@ export class MessageService {
 
     await this.messageRepo.save(mensajeBot);
 
+    // Log para verificar que se envió la respuesta
+    this.logger.log(
+      `✅ Respuesta del bot enviada al usuario ${userId} en chat ${chatId}. ID Msj Usuario: ${mensajeUsuario.id}, ID Msj Bot: ${mensajeBot.id}`,
+    );
+    
+    // Verificar si se guardó la relación
+    // const verify = await this.messageRepo.findOne({ where: { id: mensajeUsuario.id }, relations: ['wiseChat'] });
+    // this.logger.debug(`🔍 Verificación post-save: Chat ID en mensaje: ${verify?.wiseChat?.id}`);
+
     // 6. Actualizar sentimiento global del chat
     chat.sentimiento_general = String(iaResult.sentimiento);
     chat.nivel_urgencia_general = String(iaResult.nivel_urgencia);
-    await this.chatRepo.save(chat);
+
+    // IMPORTANTE: No guardar 'chat' con sus relaciones aquí si no queremos sobrescribir messages
+    // TypeORM a veces borra relaciones OneToMany si no se cargan completas y se guarda el padre con cascade: true
+    
+    // Opción Segura: Actualizar solo los campos específicos del chat
+    await this.chatRepo.update(chat.id, {
+      sentimiento_general: chat.sentimiento_general,
+      nivel_urgencia_general: chat.nivel_urgencia_general
+    });
 
     return {
       ok: true,
       mensajeUsuario,
       mensajeBot,
       chatActualizado: chat,
+    };
+  }
+
+  /**
+   * Obtener todos los mensajes de un chat
+   */
+  async obtenerMensajesPorChat(chatId: number): Promise<Message[]> {
+    this.logger.log(`🔍 Solicitando mensajes para Chat ID: ${chatId} (Tipo: ${typeof chatId})`);
+    
+    const chat = await this.chatRepo.findOne({
+      where: { id: chatId },
+    });
+
+    if (!chat) {
+      throw new NotFoundException(`Chat con ID ${chatId} no encontrado`);
+    }
+
+    const mensajes = await this.messageRepo.find({
+      where: { wiseChat: { id: chatId } },
+      relations: ['user', 'wiseChat'], // Agregado wiseChat para verificar
+      order: {
+        creation_date: 'ASC',
+      },
+    });
+
+    this.logger.log(
+      `📬 Obtenidos ${mensajes.length} mensajes del chat ${chatId} desde la DB`,
+    );
+
+    if (mensajes.length > 0) {
+        this.logger.debug(`Primer mensaje ID: ${mensajes[0].id}, Chat Relacionado ID: ${mensajes[0].wiseChat?.id}`);
+    }
+
+    return mensajes;
+  }
+
+  /**
+   * Verificar si hay respuestas del bot para un chat
+   */
+  async verificarRespuestasBot(chatId: number): Promise<{
+    tieneRespuestas: boolean;
+    totalMensajes: number;
+    mensajesBot: number;
+    ultimaRespuesta: Message | null;
+  }> {
+    const mensajes = await this.obtenerMensajesPorChat(chatId);
+    const mensajesBot = mensajes.filter((m) => m.isBot);
+    const ultimaRespuesta =
+      mensajesBot.length > 0
+        ? mensajesBot[mensajesBot.length - 1]
+        : null;
+
+    return {
+      tieneRespuestas: mensajesBot.length > 0,
+      totalMensajes: mensajes.length,
+      mensajesBot: mensajesBot.length,
+      ultimaRespuesta,
     };
   }
 }

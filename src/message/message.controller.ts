@@ -1,4 +1,12 @@
-import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Param,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -20,5 +28,21 @@ export class MessageController {
       Number(dto.chatId), // conversión segura
       dto.contenido,
     );
+  }
+
+  /**
+   * Obtener todos los mensajes de un chat
+   */
+  @Get('chat/:chatId')
+  async obtenerMensajesPorChat(@Param('chatId') chatId: string) {
+    return await this.messageService.obtenerMensajesPorChat(Number(chatId));
+  }
+
+  /**
+   * Verificar si hay respuestas del bot en un chat
+   */
+  @Get('chat/:chatId/bot-status')
+  async verificarRespuestasBot(@Param('chatId') chatId: string) {
+    return await this.messageService.verificarRespuestasBot(Number(chatId));
   }
 }

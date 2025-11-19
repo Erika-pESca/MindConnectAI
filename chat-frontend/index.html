@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindConnect AI - Chat</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            height: 90vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .chat-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .login-section {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .login-section h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .input-group label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        input {
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .error {
+            color: #ef4444;
+            font-size: 14px;
+            padding: 10px;
+            background: #fee2e2;
+            border-radius: 8px;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f9fafb;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            display: flex;
+            gap: 10px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .message.bot .message-avatar {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.bot .message-content {
+            background: white;
+            color: #333;
+            border: 1px solid #e5e7eb;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+
+        .input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 10px;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: none;
+            max-height: 100px;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .send-button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .send-button:hover:not(:disabled) {
+            transform: scale(1.05);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: flex;
+            gap: 5px;
+            padding: 12px 16px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            max-width: 70px;
+        }
+
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #667eea;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        .chat-selector {
+            padding: 15px 20px;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-selector select {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .create-chat-btn {
+            padding: 10px 16px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .create-chat-btn:hover {
+            background: #059669;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const API_URL = 'http://localhost:3000';
+
+        // Componente de Login
+        function LoginSection({ onLogin }) {
+            const [email, setEmail] = useState('');
+            const [password, setPassword] = useState('');
+            const [error, setError] = useState('');
+            const [loading, setLoading] = useState(false);
+
+            const handleLogin = async () => {
+                setError('');
+                setLoading(true);
+
+                try {
+                    const response = await fetch(`${API_URL}/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password }),
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Error al iniciar sesión');
+                    }
+
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    onLogin(data.token, data.user);
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className="login-section">
+                    <h2>🔐 Iniciar Sesión</h2>
+                    <div className="input-group">
+                        <label>Email</label>
+                        <input
+                            type="email"
+                            placeholder="tu@email.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+                        />
+                    </div>
+                    <div className="input-group">
+                        <label>Contraseña</label>
+                        <input
+                            type="password"
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+                        />
+                    </div>
+                    {error && <div className="error">❌ {error}</div>}
+                    <button onClick={handleLogin} disabled={loading || !email || !password}>
+                        {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+                    </button>
+                </div>
+            );
+        }
+
+        // Componente de Mensaje
+        function Message({ message, isBot }) {
+            const time = new Date(message.creation_date || Date.now()).toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit',
+            });
+
+            return (
+                <div className={`message ${isBot ? 'bot' : 'user'}`}>
+                    <div className="message-avatar">
+                        {isBot ? '🤖' : '👤'}
+                    </div>
+                    <div>
+                        <div className="message-content">
+                            {message.content}
+                        </div>
+                        <div className="message-time">{time}</div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Componente Principal del Chat
+        function ChatApp() {
+            const [token, setToken] = useState(localStorage.getItem('token'));
+            const [user, setUser] = useState(JSON.parse(localStorage.getItem('user') || 'null'));
+            const [chats, setChats] = useState([]);
+            const [currentChatId, setCurrentChatId] = useState(null);
+            const [messages, setMessages] = useState([]);
+            const [messagesCache, setMessagesCache] = useState({}); // Caché para guardar mensajes de chats anteriores
+            const [inputMessage, setInputMessage] = useState('');
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
+            const messagesEndRef = useRef(null);
+            const currentChatIdRef = useRef(currentChatId);
+
+            // Mantener la referencia del chat actual actualizada
+            useEffect(() => {
+                currentChatIdRef.current = currentChatId;
+            }, [currentChatId]);
+
+            const scrollToBottom = () => {
+                messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            };
+
+            useEffect(() => {
+                scrollToBottom();
+            }, [messages]);
+
+            // Cargar chats cuando se inicia sesión
+            useEffect(() => {
+                if (token) {
+                    loadChats();
+                }
+            }, [token]);
+
+            // Cargar mensajes cuando se selecciona un chat
+            useEffect(() => {
+                let active = true;
+
+                const fetchMessages = async () => {
+                    if (!currentChatId) return;
+
+                    // 1. Intentar cargar desde caché primero para respuesta inmediata
+                    if (messagesCache[currentChatId]) {
+                        console.log('Cargando desde caché para chat:', currentChatId);
+                        setMessages(messagesCache[currentChatId]);
+                        setLoading(false);
+                    } else {
+                        setMessages([]);
+                        setLoading(true);
+                    }
+                    
+                    setError('');
+
+                    try {
+                        // 2. Siempre consultar al servidor para tener la última versión (background sync)
+                        console.log(`📡 Fetching messages for chat ${currentChatId}...`);
+                        const response = await fetch(`${API_URL}/messages/chat/${currentChatId}`, {
+                            headers: { 'Authorization': `Bearer ${token}` },
+                        });
+
+                        if (!response.ok) throw new Error('Error al cargar mensajes');
+
+                        const data = await response.json();
+                        console.log(`📥 Received ${data.length} messages for chat ${currentChatId}`);
+                        
+                        if (active) {
+                            const newMessages = data || [];
+                            
+                            // Log para depuración
+                            if (newMessages.length === 0 && messagesCache[currentChatId]?.length > 0) {
+                                console.warn(`⚠️ Server returned 0 messages but cache had ${messagesCache[currentChatId].length}. This is suspicious.`);
+                                // Si el servidor dice 0 pero teníamos caché, mantenemos la caché como fallback visual
+                                // Esto evita el "borrado" visual si el servidor falla en devolver datos
+                                if (messagesCache[currentChatId]?.length > 0) {
+                                    console.log('🛡️ Keeping cached messages due to suspicious empty response');
+                                    // No sobrescribimos con array vacío
+                                    setLoading(false);
+                                    return; 
+                                }
+                            }
+
+                            setMessages(newMessages);
+                            // Actualizar caché
+                            setMessagesCache(prev => ({
+                                ...prev,
+                                [currentChatId]: newMessages
+                            }));
+                        }
+                    } catch (err) {
+                        if (active) {
+                            console.error('Error:', err);
+                            // Si falló la red pero teníamos caché, no mostramos error, nos quedamos con lo viejo
+                            if (!messagesCache[currentChatId]) {
+                                setError('Error al cargar mensajes: ' + err.message);
+                            }
+                        }
+                    } finally {
+                        if (active) {
+                            setLoading(false);
+                        }
+                    }
+                };
+
+                fetchMessages();
+
+                return () => {
+                    active = false;
+                };
+            }, [currentChatId, token]);
+
+            const loadChats = async () => {
+                try {
+                    // Consultar los chats del usuario al backend
+                    const response = await fetch(`${API_URL}/wise-chat`, {
+                        headers: { 
+                            'Authorization': `Bearer ${token}` 
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        setChats(data);
+
+                        // Si hay chats y no hay uno seleccionado, seleccionar el más reciente
+                        if (data.length > 0 && !currentChatId) {
+                            setCurrentChatId(data[0].id);
+                        } 
+                        // Si no hay chats, crear uno nuevo automáticamente
+                        else if (data.length === 0 && !currentChatId) {
+                            await createChat();
+                        }
+                    }
+                } catch (err) {
+                    console.error('Error cargando chats:', err);
+                    setError('Error al cargar el historial de chats');
+                }
+            };
+
+            const createChat = async () => {
+                try {
+                    const response = await fetch(`${API_URL}/wise-chat`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({
+                            nombre_chat: `Chat ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
+                            descripcion: 'Chat de prueba',
+                        }),
+                    });
+
+                    if (!response.ok) throw new Error('Error al crear chat');
+
+                    const chat = await response.json();
+                    setChats(prev => [chat, ...prev]);
+                    setMessages([]); // Chat nuevo inicia vacío
+                    setCurrentChatId(chat.id);
+                } catch (err) {
+                    setError('Error al crear chat: ' + err.message);
+                }
+            };
+
+            // loadMessages function removed as it is now inside useEffect
+
+            const sendMessage = async () => {
+                const sendingChatId = currentChatId; // Capturar ID del chat al momento de enviar
+                if (!inputMessage.trim() || !sendingChatId || loading) return;
+
+                const messageText = inputMessage.trim();
+                setInputMessage('');
+                setLoading(true);
+                setError('');
+
+                // Agregar mensaje del usuario inmediatamente (optimista)
+                const userMessage = {
+                    id: Date.now(),
+                    content: messageText,
+                    isBot: false,
+                    creation_date: new Date().toISOString(),
+                };
+                
+                // 1. Actualizar caché del chat específico (siempre)
+                setMessagesCache(prev => ({
+                    ...prev,
+                    [sendingChatId]: [...(prev[sendingChatId] || []), userMessage]
+                }));
+
+                // 2. Actualizar vista SOLO si seguimos en el mismo chat
+                if (sendingChatId === currentChatIdRef.current) {
+                    setMessages((prev) => [...prev, userMessage]);
+                }
+
+                try {
+                    const response = await fetch(`${API_URL}/messages`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({
+                            chatId: sendingChatId,
+                            contenido: messageText,
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.message || 'Error al enviar mensaje');
+                    }
+
+                    const data = await response.json();
+
+                    // Función helper para actualizar la lista de mensajes reemplazando el optimista
+                    const updateMessageList = (list) => {
+                        const filtered = (list || []).filter((m) => m.id !== userMessage.id);
+                        return [...filtered, data.mensajeUsuario, data.mensajeBot];
+                    };
+
+                    // 1. Actualizar caché con datos reales
+                    setMessagesCache(prev => ({
+                        ...prev,
+                        [sendingChatId]: updateMessageList(prev[sendingChatId])
+                    }));
+
+                    // 2. Actualizar vista SOLO si seguimos en el mismo chat
+                    if (sendingChatId === currentChatIdRef.current) {
+                        setMessages(prev => updateMessageList(prev));
+                        
+                        // Verificar en la consola
+                        console.log('✅ Respuesta recibida en chat', sendingChatId);
+                    }
+                } catch (err) {
+                    // Revertir cambios en caso de error
+                    const revertList = (list) => (list || []).filter((m) => m.id !== userMessage.id);
+
+                    setMessagesCache(prev => ({
+                        ...prev,
+                        [sendingChatId]: revertList(prev[sendingChatId])
+                    }));
+
+                    if (sendingChatId === currentChatIdRef.current) {
+                        setMessages(prev => revertList(prev));
+                        setError('Error: ' + err.message);
+                    }
+                } finally {
+                    // Solo desactivar loading si seguimos en el mismo chat
+                    // (si cambiamos, el nuevo chat manejará su propio loading)
+                    if (sendingChatId === currentChatIdRef.current) {
+                        setLoading(false);
+                    }
+                }
+            };
+
+            const handleLogin = (newToken, newUser) => {
+                setToken(newToken);
+                setUser(newUser);
+            };
+
+            const handleLogout = () => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                setToken(null);
+                setUser(null);
+                setChats([]);
+                setCurrentChatId(null);
+                setMessages([]);
+                setMessagesCache({}); // Limpiar caché al salir
+            };
+
+            if (!token) {
+                return (
+                    <div className="chat-container">
+                        <div className="chat-header">
+                            <h1>🤖 MindConnect AI</h1>
+                        </div>
+                        <LoginSection onLogin={handleLogin} />
+                    </div>
+                );
+            }
+
+            return (
+                <div className="chat-container">
+                    <div className="chat-header">
+                        <div>
+                            <h1>🤖 MindConnect AI</h1>
+                            <div className="chat-status">
+                                <div className="status-dot"></div>
+                                <span>Conectado como {user?.email}</span>
+                            </div>
+                        </div>
+                        <button onClick={handleLogout} style={{ background: '#ef4444' }}>
+                            Cerrar Sesión
+                        </button>
+                    </div>
+
+                    {!currentChatId ? (
+                        <div className="login-section">
+                            <h2>Crear un nuevo chat</h2>
+                            <button onClick={createChat}>Crear Chat</button>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="chat-selector">
+                                <select 
+                                    value={currentChatId || ''} 
+                                    onChange={(e) => {
+                                        const newId = Number(e.target.value);
+                                        // Actualizar mensajes inmediatamente desde caché o limpiar para evitar flash de contenido anterior
+                                        setMessages(messagesCache[newId] || []);
+                                        setCurrentChatId(newId);
+                                    }}
+                                >
+                                    {chats.map(chat => (
+                                        <option key={chat.id} value={chat.id}>
+                                            Chat #{chat.id} - {chat.nombre_chat} ({new Date(chat.fecha_creacion).toLocaleDateString()})
+                                        </option>
+                                    ))}
+                                </select>
+                                <button className="create-chat-btn" onClick={createChat}>
+                                    + Nuevo Chat
+                                </button>
+                            </div>
+
+                            <div className="messages-container">
+                                {messages.length === 0 ? (
+                                    <div style={{ textAlign: 'center', color: '#9ca3af', marginTop: '50%' }}>
+                                        <div style={{ fontSize: '48px', marginBottom: '10px' }}>💬</div>
+                                        <p>Envía un mensaje para comenzar...</p>
+                                    </div>
+                                ) : (
+                                    messages.map((msg) => (
+                                        <Message key={msg.id} message={msg} isBot={msg.isBot} />
+                                    ))
+                                )}
+                                {loading && (
+                                    <div className="message bot">
+                                        <div className="message-avatar">🤖</div>
+                                        <div className="loading">
+                                            <div className="loading-dot"></div>
+                                            <div className="loading-dot"></div>
+                                            <div className="loading-dot"></div>
+                                        </div>
+                                    </div>
+                                )}
+                                <div ref={messagesEndRef} />
+                            </div>
+
+                            {error && (
+                                <div style={{ padding: '10px 20px', background: '#fee2e2', color: '#ef4444' }}>
+                                    ❌ {error}
+                                </div>
+                            )}
+
+                            <div className="input-container">
+                                <input
+                                    className="message-input"
+                                    type="text"
+                                    placeholder="Escribe un mensaje..."
+                                    value={inputMessage}
+                                    onChange={(e) => setInputMessage(e.target.value)}
+                                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                                    disabled={loading}
+                                />
+                                <button className="send-button" onClick={sendMessage} disabled={loading || !inputMessage.trim()}>
+                                    Enviar
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </div>
+            );
+        }
+
+        // Renderizar la app
+        ReactDOM.render(<ChatApp />, document.getElementById('root'));
+    </script>
+</body>
+</html>
+

@@ -1,54 +1,93 @@
-### 🧠 Crear un nuevo chat
+###############################################
+# 📝 NOTA: Lee GUIA_USAR_MESSAGES_HTTP.md para instrucciones completas
+###############################################
+
+# 🔑 PASO 0: Obtener Token JWT
+# Primero debes hacer login en: src/auth/http/auth.http
+# Luego copia el token y actualízalo abajo en @token
+
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiZXBlc2NhYWxmb25zb0BnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjM0NjkxNDgsImV4cCI6MTc2MzU1NTU0OH0.BcjKDRLRCcLtj8smEx9Sqn-9KGHEtZE0eRcRmrRKR1U
+@chatId = 1
+
+###############################################
+# 🧠 PASO 1: Crear un nuevo chat
+###############################################
+### Crea un chat nuevo y copia el ID de la respuesta
 POST http://localhost:3000/wise-chat
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiZXBlc2NhYWxmb25zb0BnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjM0NjkxNDgsImV4cCI6MTc2MzU1NTU0OH0.BcjKDRLRCcLtj8smEx9Sqn-9KGHEtZE0eRcRmrRKR1U
+Authorization: Bearer {{token}}
+
 {
   "nombre_chat": "Mi primer chat de prueba",
   "descripcion": "Un chat para probar el flujo de mensajes"
 }
 
+# 👉 IMPORTANTE: Copia el "id" de la respuesta y actualiza @chatId arriba
+
 ###############################################
-# 🔵 1. CREAR MENSAJE (PRUEBA COMPLETA)
+# 🔵 PASO 2: CREAR MENSAJE (PRUEBA COMPLETA)
 ###############################################
+### Envía un mensaje y recibe respuesta automática del bot
 POST http://localhost:3000/messages
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiZXBlc2NhYWxmb25zb0BnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjM0NjkxNDgsImV4cCI6MTc2MzU1NTU0OH0.BcjKDRLRCcLtj8smEx9Sqn-9KGHEtZE0eRcRmrRKR1U
+Authorization: Bearer {{token}}
+
 {
-  "chatId": 2,
+  "chatId": {{chatId}},
   "contenido": "Me siento muy de malgenio"
 }
 
+# 👉 La respuesta incluirá:
+#    - mensajeUsuario: Tu mensaje guardado
+#    - mensajeBot: Respuesta del bot (isBot: true)
+
 ###
 ###############################################
-# 🔵 2. CREAR MENSAJE POSITIVO
+# 🔵 2b. CREAR MENSAJE POSITIVO (Ejemplo)
 ###############################################
 POST http://localhost:3000/messages
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
-  "userId": 1,
-  "wiseChatId": 1,
-  "content": "Hoy fue un día maravilloso, gracias por escucharme!"
+  "chatId": {{chatId}},
+  "contenido": "Hoy fue un día maravilloso, gracias por escucharme!"
 }
 
 ###
 ###############################################
-# 🔵 3. CREAR MENSAJE NEUTRAL
+# 🔵 2c. CREAR MENSAJE NEUTRAL (Ejemplo)
 ###############################################
 POST http://localhost:3000/messages
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
-  "userId": 1,
-  "wiseChatId": 1,
-  "content": "Estoy organizando mis tareas"
+  "chatId": {{chatId}},
+  "contenido": "Estoy organizando mis tareas"
 }
 
 ###
 ###############################################
-# 🔵 4. OBTENER MENSAJES DE UN CHAT
+# 🔵 PASO 3: OBTENER MENSAJES DE UN CHAT
 ###############################################
-GET http://localhost:3000/messages/chat/1
+### Obtiene todos los mensajes de un chat (usuarios + bot)
+GET http://localhost:3000/messages/chat/{{chatId}}
+
+# 👉 Filtra por isBot: true para ver solo mensajes del bot
+
+###
+###############################################
+# 🤖 PASO 4: VERIFICAR RESPUESTAS DEL BOT EN UN CHAT
+###############################################
+### Resumen rápido: ¿El bot está respondiendo?
+GET http://localhost:3000/messages/chat/{{chatId}}/bot-status
+
+# 👉 Respuesta incluirá:
+#    - tieneRespuestas: boolean (true = bot está respondiendo)
+#    - totalMensajes: number
+#    - mensajesBot: number (cuántos mensajes son del bot)
+#    - ultimaRespuesta: Message | null (última respuesta del bot)
 
 ###
 ###############################################
@@ -64,16 +103,18 @@ Authorization: Bearer {{HUGGINGFACE_API_KEY}}
 
 ###
 ###############################################
-# 🧪 6. PRUEBA RESPUESTA TINY LLAMA
+# 🧪 PASO 5: PRUEBA RESPUESTA TINY LLAMA
 ###############################################
+### Prueba específica para verificar que TinyLlama está funcionando
 POST http://localhost:3000/messages
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiZXBlc2NhYWxmb25zb0BnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjM0NjkxNDgsImV4cCI6MTc2MzU1NTU0OH0.BcjKDRLRCcLtj8smEx9Sqn-9KGHEtZE0eRcRmrRKR1U
+Authorization: Bearer {{token}}
 
 {
-  "chatId": 1,
+  "chatId": {{chatId}},
   "contenido": "Tiny, ¿puedes responderme? Necesito saber si estás ahí"
 }
 
 # 👉 La respuesta HTTP incluirá `mensajeBot.content`
 #    con el texto generado por TinyLlamaService.
+#    Si isBot: true y tiene contenido, TinyLlama está funcionando ✅
