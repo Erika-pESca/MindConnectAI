@@ -18,6 +18,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 
 import { MailerService } from '@nestjs-modules/mailer';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -27,6 +28,7 @@ export class AuthService {
 
     private readonly jwtService: JwtService,
     private readonly mailerService: MailerService,
+    private readonly configService: ConfigService,
   ) {}
 
   // ------------------------
@@ -62,8 +64,9 @@ export class AuthService {
   // 🔹 LOGIN
   // ------------------------
   async login(dto: LoginDto) {
+    // Buscar por nombre de usuario (name)
     const user = await this.userRepo.findOne({
-      where: { email: dto.email },
+      where: { name: dto.name },
     });
 
     if (!user) throw new NotFoundException('Usuario no encontrado');
@@ -105,7 +108,10 @@ export class AuthService {
     { expiresIn: '30m' },
   );
 
-  const resetLink = `http://localhost:3000/auth/reset-password?token=${token}`;
+
+  // Construir enlace directo al frontend para abrir la UI de restablecer contraseña
+  const frontend = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+  const resetLink = `${frontend.replace(/\/$/, '')}/reset-password.html?token=${token}`;
 
 
   await this.mailerService.sendMail({
