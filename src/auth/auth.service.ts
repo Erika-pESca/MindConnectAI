@@ -18,16 +18,43 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class AuthService {
+  private logoBase64: string | null = null;
+
   constructor(
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
     private readonly jwtService: JwtService,
     private readonly mailerService: MailerService,
     private readonly configService: ConfigService,
-  ) {}
+  ) {
+    // Cargar el logo en base64 al inicializar el servicio
+    this.loadLogo();
+  }
+
+  private loadLogo() {
+    try {
+      const logoPath = path.join(
+        process.cwd(),
+        'frontend',
+        'assets',
+        'Logo-completo-fondo-blanco.png',
+      );
+      console.log('🔍 Intentando cargar logo desde:', logoPath);
+      const imageBuffer = fs.readFileSync(logoPath);
+      const base64Image = imageBuffer.toString('base64');
+      this.logoBase64 = `data:image/png;base64,${base64Image}`;
+      console.log('✅ Logo cargado correctamente. Longitud base64:', base64Image.length);
+    } catch (error) {
+      console.error('❌ No se pudo cargar el logo:', error.message);
+      console.error('Error completo:', error);
+      this.logoBase64 = null;
+    }
+  }
 
   // ------------------------
   // 🔹 REGISTRAR USUARIO
@@ -111,7 +138,11 @@ export class AuthService {
     
     // Log para depuración (remover en producción)
     console.log('Reset link generado:', resetLink);
+    console.log('Logo disponible:', this.logoBase64 ? 'Sí (base64)' : 'No, usando URL fallback');
+    console.log('Logo length:', this.logoBase64 ? this.logoBase64.length : 0);
 
+    const logoUrl = this.logoBase64 || 'http://localhost:3000/assets/Logo-completo-fondo-blanco.png';
+    
     await this.mailerService.sendMail({
       to: user.email,
       subject: 'Recuperación de contraseña',
@@ -119,6 +150,7 @@ export class AuthService {
       context: {
         name: user.name,
         resetLink: resetLink,
+        logoUrl: logoUrl,
       },
     });
 

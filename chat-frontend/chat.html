@@ -16,7 +16,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #FFF0F5 0%, #F0E6FF 50%, #E6F3FF 100%);
             height: 100vh;
             display: flex;
             justify-content: center;
@@ -37,12 +37,13 @@
         }
 
         .chat-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #9B59B6 0%, #5DADE2 100%);
             color: white;
             padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 4px 12px rgba(155,89,182,0.2);
         }
 
         .chat-header h1 {
@@ -104,24 +105,27 @@
 
         input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #9B59B6;
+            box-shadow: 0 0 0 3px rgba(155,89,182,0.1);
         }
 
         button {
             padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #5DADE2 0%, #9B59B6 100%);
             color: white;
             border: none;
             border-radius: 8px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(93,173,226,0.3);
         }
 
         button:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 6px 16px rgba(93,173,226,0.4);
+            background: linear-gradient(135deg, #3498DB 0%, #8E44AD 100%);
         }
 
         button:disabled {
@@ -130,11 +134,12 @@
         }
 
         .error {
-            color: #ef4444;
+            color: #E74C3C;
             font-size: 14px;
             padding: 10px;
-            background: #fee2e2;
+            background: #FFE5E5;
             border-radius: 8px;
+            border-left: 4px solid #E74C3C;
         }
 
         .messages-container {
@@ -166,6 +171,7 @@
 
         .message.user {
             flex-direction: row-reverse;
+            gap: 3px;
         }
 
         .message-avatar {
@@ -181,12 +187,12 @@
         }
 
         .message.user .message-avatar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #9B59B6 0%, #8E44AD 100%);
             color: white;
         }
 
         .message.bot .message-avatar {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            background: linear-gradient(135deg, #5DADE2 0%, #3498DB 100%);
             color: white;
         }
 
@@ -199,7 +205,7 @@
         }
 
         .message.user .message-content {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #9B59B6 0%, #8E44AD 100%);
             color: white;
             border-bottom-right-radius: 4px;
         }
@@ -222,7 +228,7 @@
             background: white;
             border-top: 1px solid #e5e7eb;
             display: flex;
-            gap: 10px;
+            gap: 5px;
         }
 
         .message-input {
@@ -237,22 +243,25 @@
 
         .message-input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #9B59B6;
+            box-shadow: 0 0 0 3px rgba(155,89,182,0.1);
         }
 
         .send-button {
             padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #5DADE2 0%, #9B59B6 100%);
             color: white;
             border: none;
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(93,173,226,0.3);
         }
 
         .send-button:hover:not(:disabled) {
-            transform: scale(1.05);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 6px 16px rgba(93,173,226,0.4);
         }
 
         .send-button:disabled {
@@ -274,7 +283,7 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #667eea;
+            background: #9B59B6;
             animation: bounce 1.4s infinite ease-in-out both;
         }
 
@@ -298,24 +307,36 @@
         .chat-selector select {
             flex: 1;
             padding: 10px;
-            border: 2px solid #e5e7eb;
+            border: 2px solid #D7BDE2;
             border-radius: 8px;
             font-size: 14px;
+            background: #FFF8FC;
+            transition: all 0.2s;
+        }
+        
+        .chat-selector select:focus {
+            outline: none;
+            border-color: #9B59B6;
+            box-shadow: 0 0 0 3px rgba(155,89,182,0.1);
         }
 
         .create-chat-btn {
             padding: 10px 16px;
-            background: #10b981;
+            background: linear-gradient(135deg, #FFB6C1 0%, #FF9BB5 100%);
             color: white;
             border: none;
             border-radius: 8px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(255,182,193,0.3);
         }
 
         .create-chat-btn:hover {
-            background: #059669;
+            background: linear-gradient(135deg, #FF9BB5 0%, #FF85A3 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255,182,193,0.4);
         }
     </style>
 </head>
@@ -336,8 +357,15 @@
 
             return (
                 <div className={`message ${isBot ? 'bot' : 'user'}`}>
-                    <div className="message-avatar">
-                        {isBot ? '🤖' : '👤'}
+                    <div className="message-avatar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                        {isBot ? (
+                            <img 
+                                src="http://localhost:3000/assets/imagotipo.png" 
+                                alt="Bot" 
+                                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.textContent = '🤖'; }}
+                            />
+                        ) : '👤'}
                     </div>
                     <div>
                         <div className="message-content">
@@ -496,7 +524,7 @@
                             'Authorization': `Bearer ${token}`,
                         },
                         body: JSON.stringify({
-                            nombre_chat: `Chat ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
+                            nombre_chat: 'Nuevo chat',
                             descripcion: 'Chat de prueba',
                         }),
                     });
@@ -522,6 +550,26 @@
                 setInputMessage('');
                 setLoading(true);
                 setError('');
+
+                // Verificar si es el primer mensaje del chat para actualizar el título
+                const isFirstMessage = messages.length === 0 && (!messagesCache[sendingChatId] || messagesCache[sendingChatId].length === 0);
+                
+                // Generar título basado en el primer mensaje (máximo 50 caracteres)
+                let newChatTitle = null;
+                if (isFirstMessage) {
+                    // Tomar las primeras palabras del mensaje, máximo 50 caracteres
+                    const words = messageText.split(' ').slice(0, 8); // Primeras 8 palabras
+                    newChatTitle = words.join(' ');
+                    if (newChatTitle.length > 50) {
+                        newChatTitle = newChatTitle.substring(0, 47) + '...';
+                    }
+                    // Actualizar el nombre del chat en la lista local
+                    setChats(prev => prev.map(chat => 
+                        chat.id === sendingChatId 
+                            ? { ...chat, nombre_chat: newChatTitle }
+                            : chat
+                    ));
+                }
 
                 // Agregar mensaje del usuario inmediatamente (optimista)
                 const userMessage = {
@@ -624,7 +672,15 @@
                 return (
                     <div className="chat-container">
                         <div className="chat-header">
-                            <h1>🤖 MindConnect AI</h1>
+                            <h1 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <img 
+                                    src="http://localhost:3000/assets/imagotipo.png" 
+                                    alt="MindConnect AI" 
+                                    style={{ width: '48px', height: '48px', objectFit: 'contain' }}
+                                    onError={(e) => { e.target.style.display = 'none'; }}
+                                />
+                                MindConnect AI
+                            </h1>
                         </div>
                         <div style={{ padding: '30px', textAlign: 'center' }}>
                             <p>Redirigiendo al login...</p>
@@ -637,13 +693,31 @@
                 <div className="chat-container">
                     <div className="chat-header">
                         <div>
-                            <h1>🤖 MindConnect AI</h1>
+                            <h1 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <img 
+                                    src="http://localhost:3000/assets/imagotipo.png" 
+                                    alt="MindConnect AI" 
+                                    style={{ width: '48px', height: '48px', objectFit: 'contain' }}
+                                    onError={(e) => { e.target.style.display = 'none'; }}
+                                />
+                                MindConnect AI
+                            </h1>
                             <div className="chat-status">
                                 <div className="status-dot"></div>
                                 <span>Conectado como {user?.name || user?.email}</span>
                             </div>
                         </div>
-                        <button onClick={handleLogout} style={{ background: '#ef4444' }}>
+                        <button onClick={handleLogout} style={{ 
+                            background: 'linear-gradient(135deg, #FF9BB5 0%, #FF85A3 100%)', 
+                            boxShadow: '0 4px 12px rgba(255,155,181,0.3)',
+                            transition: 'all 0.2s'
+                        }} onMouseEnter={(e) => {
+                            e.target.style.transform = 'translateY(-2px)';
+                            e.target.style.boxShadow = '0 6px 16px rgba(255,155,181,0.4)';
+                        }} onMouseLeave={(e) => {
+                            e.target.style.transform = 'translateY(0)';
+                            e.target.style.boxShadow = '0 4px 12px rgba(255,155,181,0.3)';
+                        }}>
                             Cerrar Sesión
                         </button>
                     </div>
@@ -667,7 +741,7 @@
                                 >
                                     {chats.map(chat => (
                                         <option key={chat.id} value={chat.id}>
-                                            Chat #{chat.id} - {chat.nombre_chat} ({new Date(chat.fecha_creacion).toLocaleDateString()})
+                                            {chat.nombre_chat || `Chat #${chat.id}`}
                                         </option>
                                     ))}
                                 </select>
@@ -689,7 +763,14 @@
                                 )}
                                 {loading && (
                                     <div className="message bot">
-                                        <div className="message-avatar">🤖</div>
+                                        <div className="message-avatar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                                            <img 
+                                                src="http://localhost:3000/assets/imagotipo.png" 
+                                                alt="Bot" 
+                                                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                                onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.textContent = '🤖'; }}
+                                            />
+                                        </div>
                                         <div className="loading">
                                             <div className="loading-dot"></div>
                                             <div className="loading-dot"></div>
@@ -701,7 +782,13 @@
                             </div>
 
                             {error && (
-                                <div style={{ padding: '10px 20px', background: '#fee2e2', color: '#ef4444' }}>
+                                <div style={{ 
+                                    padding: '10px 20px', 
+                                    background: '#FFE5E5', 
+                                    color: '#E74C3C',
+                                    borderRadius: '8px',
+                                    borderLeft: '4px solid #E74C3C'
+                                }}>
                                     ❌ {error}
                                 </div>
                             )}

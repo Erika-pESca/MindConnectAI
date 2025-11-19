@@ -14,38 +14,56 @@
   <style>
   /* aplicacion de custom properties  */
   :root{
-    /* Paleta de colores: violeta y verde */
-    --primary: #7B6BEA; 
-    --primary-2: #9D86FF;
-    --accent: #70D6A5;
-    --accent-dark: #4CC07A;
+    /* Paleta de colores: Rosado, Morado y Azul - Salud Mental */
+    /* Rosado suave - Tranquilidad y calma */
+    --pink-light: #FFD1DC;
+    --pink: #FFB6C1;
+    --pink-medium: #FF9BB5;
+    
+    /* Morado - Sabiduría y espiritualidad */
+    --purple-light: #D7BDE2;
+    --purple: #9B59B6;
+    --purple-dark: #8E44AD;
+    
+    /* Azul - Confianza y serenidad */
+    --blue-light: #AED6F1;
+    --blue: #5DADE2;
+    --blue-dark: #3498DB;
+    
+    /* Colores principales */
+    --primary: var(--purple);
+    --primary-2: var(--purple-dark);
+    --accent: var(--blue);
+    --accent-dark: var(--blue-dark);
+    --accent-soft: var(--pink);
 
-    /* Backgrounds */
-    --bg-start: #f3f6ff;
-    --bg-end: #f6fbf7;
+    /* Backgrounds - Gradientes suaves */
+    --bg-start: #FFF0F5; /* Rosado muy claro */
+    --bg-end: #F0E6FF; /* Morado muy claro */
+    --bg-gradient: linear-gradient(135deg, #FFF0F5 0%, #F0E6FF 50%, #E6F3FF 100%);
 
     /* Texto */
-    --panel-start: var(--primary);
-    --panel-end: var(--primary-2);
+    --panel-start: var(--purple);
+    --panel-end: var(--blue);
     --panel-text: #ffffff;
-    --panel-text-shadow: 0 2px 6px rgba(0,0,0,0.18);
+    --panel-text-shadow: 0 2px 6px rgba(0,0,0,0.15);
 
     --form-bg: #ffffff;
     --form-card-bg: #ffffff;
-    --form-input-bg: #fbfdff;
+    --form-input-bg: #FFF8FC;
 
-    /* Botones contorno */
+    /* Botones */
     --btn-text: #ffffff;
-    --btn-shadow-rgb: 76,192,122;
+    --btn-shadow-rgb: 93,173,226;
 
-    --muted: #f6f7fb;
+    --muted: #F8F4F9;
     /* altura del contenedor principal */
     --container-height: 720px;
   }
 
   body { 
     font-family: 'Quicksand', sans-serif;
-    background: linear-gradient(135deg, #f3f6ff 0%, #f6fbf7 100%); 
+    background: var(--bg-gradient); 
   }
   /* transición base para panel y formulario */
   .slide-panel { 
@@ -90,12 +108,244 @@
   .form-actions { margin-top: 8px; }
 
   /* Botones y toggles */
-  .primary-btn { background: var(--accent); color: #fff; border: none; box-shadow: 0 8px 20px rgba(76,192,122,0.12); transition: background .18s ease; }
-  .primary-btn:hover { background: var(--accent-dark); }
+  .primary-btn { 
+    background: linear-gradient(135deg, var(--blue) 0%, var(--purple) 100%); 
+    color: #fff; 
+    border: none; 
+    box-shadow: 0 8px 20px rgba(93,173,226,0.25); 
+    transition: all .18s ease; 
+  }
+  .primary-btn:hover { 
+    background: linear-gradient(135deg, var(--blue-dark) 0%, var(--purple-dark) 100%); 
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(93,173,226,0.35); 
+  }
   .primary-btn[disabled] { opacity: 0.6; cursor: not-allowed; }
-  .pwd-toggle { background: transparent; border: none; color: var(--primary); font-weight: 600; cursor: pointer; }
+  .pwd-toggle { background: transparent; border: none; color: var(--purple); font-weight: 600; cursor: pointer; transition: color .15s ease; }
+  .pwd-toggle:hover { color: var(--purple-dark); }
   .toggle-btn { transition: all .15s ease; background: transparent; color: #374151; border: none; }
-  .toggle-btn.active { background: var(--primary); color: #fff; box-shadow: none; }
+  .toggle-btn.active { background: linear-gradient(135deg, var(--purple) 0%, var(--blue) 100%); color: #fff; box-shadow: 0 4px 12px rgba(155,89,182,0.3); }
+  
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .outer-container {
+      max-width: 95%;
+      height: auto !important;
+      min-height: 600px;
+    }
+    
+    .slide-panel {
+      padding: 30px 20px;
+    }
+    
+    .slide-panel h2 {
+      font-size: 2rem;
+    }
+    
+    .puzzle-anim {
+      width: 200px !important;
+      height: 200px !important;
+      margin-top: 20px !important;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    body {
+      padding: 0;
+      align-items: flex-start;
+    }
+    
+    .outer-container {
+      max-width: 100%;
+      width: 100%;
+      height: auto !important;
+      min-height: 100vh;
+      border-radius: 0;
+      flex-direction: column;
+      display: flex;
+    }
+    
+    /* Panel lateral: mostrado arriba en móviles */
+    .slide-panel {
+      position: relative !important;
+      width: 100% !important;
+      height: auto !important;
+      min-height: 180px;
+      padding: 25px 20px;
+      order: -1;
+      transform: none !important;
+    }
+    
+    .slide-panel h2 {
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+    }
+    
+    .slide-panel p {
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+    
+    .puzzle-anim {
+      width: 100px !important;
+      height: 100px !important;
+      margin-top: 10px !important;
+    }
+    
+    /* Formularios: ocupan todo el ancho */
+    .forms-wrap {
+      position: relative !important;
+      width: 100% !important;
+      height: auto !important;
+      padding: 20px 15px;
+      transform: none !important;
+      flex: 1;
+    }
+    
+    .form-card {
+      padding: 20px 15px;
+      max-width: 100%;
+      width: 100%;
+    }
+    
+    .form-card input {
+      padding: 12px;
+      font-size: 16px; /* Evita zoom en iOS */
+    }
+    
+    /* Ocultar animación de swap en móviles */
+    .outer-container.swap .slide-panel {
+      transform: none !important;
+    }
+    
+    .outer-container.swap .forms-wrap {
+      transform: none !important;
+    }
+    
+    /* Toggle buttons más pequeños */
+    .toggle-btn {
+      padding: 10px 8px;
+      font-size: 0.9rem;
+    }
+    
+    /* Logo más pequeño */
+    .form-card img {
+      height: 80px !important;
+    }
+    
+    /* Ajustar slider de formularios */
+    #formSlider {
+      width: 100% !important;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    body {
+      padding: 5px;
+    }
+    
+    .outer-container {
+      border-radius: 0;
+    }
+    
+    .slide-panel {
+      padding: 20px 15px;
+      min-height: 150px;
+    }
+    
+    .slide-panel h2 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+    
+    .slide-panel p {
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+    
+    .puzzle-anim {
+      width: 100px !important;
+      height: 100px !important;
+      margin-top: 10px !important;
+    }
+    
+    .forms-wrap {
+      padding: 15px 10px;
+    }
+    
+    .form-card {
+      padding: 15px 10px;
+    }
+    
+    .form-card label {
+      font-size: 0.9rem;
+    }
+    
+    .form-card input {
+      padding: 10px;
+      font-size: 16px;
+    }
+    
+    .primary-btn {
+      padding: 12px;
+      font-size: 1rem;
+    }
+    
+    .toggle-btn {
+      padding: 8px 6px;
+      font-size: 0.85rem;
+    }
+    
+    .form-card img {
+      height: 60px !important;
+    }
+  }
+  
+  /* Ajustes para tablets en modo vertical */
+  @media (min-width: 481px) and (max-width: 768px) {
+    .outer-container {
+      flex-direction: column;
+    }
+    
+    .slide-panel {
+      width: 100% !important;
+      height: auto;
+      min-height: 180px;
+    }
+    
+    .forms-wrap {
+      width: 100% !important;
+    }
+  }
+  
+  /* Modal responsivo */
+  @media (max-width: 768px) {
+    #forgotModal > div {
+      max-width: 90% !important;
+      margin: 20px;
+      padding: 20px !important;
+    }
+    
+    #forgotModal input {
+      font-size: 16px; /* Evita zoom en iOS */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    #forgotModal > div {
+      max-width: 95% !important;
+      margin: 10px;
+      padding: 15px !important;
+    }
+    
+    #forgotModal h3 {
+      font-size: 1.1rem;
+    }
+    
+    #forgotModal p {
+      font-size: 0.85rem;
+    }
+  }
     
   </style>
 </head>
@@ -103,10 +353,10 @@
 <!-- Estructura html aplicando diseño de componentes con tailwind  -->
 <body class="min-h-screen flex items-center justify-center p-6">
 
-  <div class="relative w-full max-w-7xl bg-white rounded-3xl shadow-2xl overflow-hidden outer-container" style="height:var(--container-height);">
+  <div class="relative w-full max-w-7xl bg-white rounded-3xl shadow-2xl overflow-hidden outer-container flex flex-col md:flex-row" style="height:var(--container-height); min-height:600px;">
 
     <!-- PANEL VIOLETA -->
-    <div id="slidePanel" class="slide-panel absolute top-0 left-0 w-1/2 h-full text-white flex flex-col items-center justify-center p-14">
+    <div id="slidePanel" class="slide-panel absolute md:relative top-0 left-0 w-full md:w-1/2 h-auto md:h-full text-white flex flex-col items-center justify-center p-8 md:p-14">
 
       <h2 id="slideTitle" class="text-4xl font-bold mb-6">¡Bienvenido a MindConnectAI!</h2>
       <div id="slideContent" class="text-center text-lg opacity-90 space-y-3 max-w-[28rem]">
@@ -124,7 +374,7 @@
     </div>
 
     <!-- CONTENEDOR FORMULARIOS -->
-    <div class="absolute right-0 top-0 w-1/2 h-full overflow-hidden bg-white p-0 forms-wrap">
+    <div class="absolute md:relative right-0 top-0 w-full md:w-1/2 h-auto md:h-full overflow-hidden bg-white p-0 forms-wrap">
 
       <!-- Centro -->
       <div class="h-full flex items-center justify-center">
@@ -159,7 +409,7 @@
                     </div>
                     <input id="loginPassword" type="password" class="w-full mt-3 p-4 rounded-xl border" placeholder="••••••" />
                     <div class="text-right mt-2">
-                      <a href="#" id="forgotPassword" style="color:var(--accent-dark);" class="text-sm hover:underline">¿Olvidaste tu contraseña?</a>
+                      <a href="#" id="forgotPassword" style="color:var(--blue);" class="text-sm hover:underline transition-colors duration-200" onmouseover="this.style.color='var(--blue-dark)'" onmouseout="this.style.color='var(--blue)'">¿Olvidaste tu contraseña?</a>
                     </div>
                   </div>
                   <div id="loginMessage" class="text-sm text-center text-red-600 mb-2"></div>
