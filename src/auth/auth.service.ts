@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -25,7 +24,6 @@ export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
-
     private readonly jwtService: JwtService,
     private readonly mailerService: MailerService,
     private readonly configService: ConfigService,
@@ -49,7 +47,7 @@ export class AuthService {
       name: dto.name,
       email: dto.email,
       password: hashedPassword,
-      role: dto.role || 'user', // admin | moderador | user
+      role: dto.role || 'user',
     });
 
     await this.userRepo.save(newUser);
@@ -64,7 +62,6 @@ export class AuthService {
   // 🔹 LOGIN
   // ------------------------
   async login(dto: LoginDto) {
-    // Buscar por nombre de usuario (name)
     const user = await this.userRepo.findOne({
       where: { name: dto.name },
     });
@@ -74,7 +71,6 @@ export class AuthService {
     const isValid = await bcrypt.compare(dto.password, user.password);
     if (!isValid) throw new UnauthorizedException('Contraseña incorrecta');
 
-    // IMPORTANTE → Usar sub para que JWT Strategy funcione
     const token = this.jwtService.sign({
       sub: user.id,
       email: user.email,
@@ -97,37 +93,32 @@ export class AuthService {
   // 🔹 ENVIAR CORREO DE RECUPERACIÓN
   // ------------------------
   async forgotPassword(dto: ForgotPasswordDto) {
-  const user = await this.userRepo.findOne({
-    where: { email: dto.email },
-  });
+    const user = await this.userRepo.findOne({
+      where: { email: dto.email },
+    });
 
-  if (!user) throw new NotFoundException('Usuario no encontrado');
+    if (!user) throw new NotFoundException('Usuario no encontrado');
 
-  const token = this.jwtService.sign(
-    { email: user.email },
-    { expiresIn: '30m' },
-  );
+    const token = this.jwtService.sign(
+      { email: user.email },
+      { expiresIn: '30m' },
+    );
 
+    const frontend = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+    const resetLink = `${frontend.replace(/\/$/, '')}/reset-password.html?token=${token}`;
 
-  // Construir enlace directo al frontend para abrir la UI de restablecer contraseña
-  const frontend = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
-  const resetLink = `${frontend.replace(/\/$/, '')}/reset-password.html?token=${token}`;
+    await this.mailerService.sendMail({
+      to: user.email,
+      subject: 'Recuperación de contraseña',
+      template: './reset-password',
+      context: {
+        name: user.name,
+        resetLink: resetLink,
+      },
+    });
 
-
-  await this.mailerService.sendMail({
-    to: user.email,
-    subject: 'Recuperación de contraseña',
-    template: './reset-password', // nombre del template SIN .hbs
-    context: {
-      name: user.name,     // 👈 Debe coincidir con {{name}}
-      resetLink: resetLink // 👈 Debe coincidir con {{resetLink}}
-    },
-  });
-
-  return { message: 'Correo enviado correctamente' };
-}
-
-
+    return { message: 'Correo enviado correctamente' };
+  }
 
   // ------------------------
   // 🔹 RESTABLECER CONTRASEÑA

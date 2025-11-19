@@ -12,6 +12,10 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { WiseChatModule } from './wise-chat/wise-chat.module';
 import { MessageModule } from './message/message.module';
+import { HistorialModule } from './historial/historial.module';
+import { NotificationModule } from './notification/notification.module';
+
+import { IaModule } from './ia/ia.module'; // 👈 IMPORTANTE
 
 import { join } from 'path';
 
@@ -23,7 +27,7 @@ import { join } from 'path';
       envFilePath: join(__dirname, '..', '.env'),
     }),
 
-    // TypeORM config
+    // Config BD
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
@@ -35,18 +39,22 @@ import { join } from 'path';
       synchronize: true,
     }),
 
-    // ❗ QUITA ESTO – NO SE NECESITA AQUÍ ❗
-    // TypeOrmModule.forFeature([...]),
-
-    // 📌 **IMPORTA LOS MÓDULOS FUNCIONALES**
+    // 📌 Módulos funcionales
     AuthModule,
     UserModule,
     WiseChatModule,
     MessageModule,
+    HistorialModule,
+    NotificationModule,
+
+    // 📌 Módulo de Inteligencia Artificial
+    IaModule, // 👈 OBLIGATORIO PARA QUE TINYLLAMA Y HUGGINGFACE FUNCIONEN
   ],
 })
 export class AppModule {
   constructor() {
-    console.log('➡️ Configuración cargada. Intentando conectar a la base de datos...');
+    console.log(
+      '➡️ Configuración cargada. Intentando conectar a la base de datos...',
+    );
   }
 }

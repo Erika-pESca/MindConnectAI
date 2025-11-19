@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { Message } from '../../message/entities/message.entity';
 import { Notification } from '../../notification/entities/notification.entity';
 import { Historial } from '../../historial/entities/historial.entity';
@@ -19,13 +25,13 @@ export class User {
 
   @Column({
     type: 'varchar',
-    default: 'user'
+    default: 'user',
   })
   role: string;
 
   @Column({
     type: 'timestamp',
-    nullable: true
+    nullable: true,
   })
   last_login: Date | null;
 

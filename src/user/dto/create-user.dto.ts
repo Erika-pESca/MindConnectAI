@@ -19,5 +19,5 @@ export class CreateUserDto {
   // 🔥 nuevo campo opcional
   @IsOptional()
   @IsString()
-  role?: string;   // 'user' o 'admin' o lo que uses
+  role?: string; // 'user' o 'admin' o lo que uses
 }

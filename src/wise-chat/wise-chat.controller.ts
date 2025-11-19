@@ -1,26 +1,32 @@
-import { Controller, Post, Get, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Param,
+  Body,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+
 import { WiseChatService } from './wise-chat.service';
+import { CreateWiseChatDto } from './dto/create-wise-chat.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-@Controller('wisechat')
+@Controller('wise-chat')
 export class WiseChatController {
-  constructor(private readonly wiseChatService: WiseChatService) {}
+  constructor(private readonly chatService: WiseChatService) {}
 
-  @Post('create')
-  create(@Body('name') name: string, @Body('description') description: string) {
-    return this.wiseChatService.createChat(name, description);
+  // Crear un chat sabio
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  async crearChat(@Req() req, @Body() dto: CreateWiseChatDto) {
+    const userId = req.user.id;
+    return await this.chatService.crearChat(userId, dto);
   }
 
-  @Post(':id/send')
-  sendMessage(
-    @Param('id') chatId: number,
-    @Body('userId') userId: number,
-    @Body('content') content: string,
-  ) {
-    return this.wiseChatService.sendMessage(userId, chatId, content);
-  }
-
-  @Get(':id/history')
-  getHistory(@Param('id') chatId: number) {
-    return this.wiseChatService.getChatHistory(chatId);
+  // Obtener un chat por ID
+  @Get(':id')
+  async obtenerChat(@Param('id') id: string) {
+    return this.chatService.obtenerChat(Number(id));
   }
 }

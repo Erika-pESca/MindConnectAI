@@ -1,12 +1,79 @@
-### Crear mensaje
-POST http://localhost:3000/message
+### 🧠 Crear un nuevo chat
+POST http://localhost:3000/wise-chat
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiZXBlc2NhYWxmb25zb0BnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjM0NjkxNDgsImV4cCI6MTc2MzU1NTU0OH0.BcjKDRLRCcLtj8smEx9Sqn-9KGHEtZE0eRcRmrRKR1U
+{
+  "nombre_chat": "Mi primer chat de prueba",
+  "descripcion": "Un chat para probar el flujo de mensajes"
+}
+
+###############################################
+# 🔵 1. CREAR MENSAJE (PRUEBA COMPLETA)
+###############################################
+POST http://localhost:3000/messages
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiZXBlc2NhYWxmb25zb0BnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjM0NjkxNDgsImV4cCI6MTc2MzU1NTU0OH0.BcjKDRLRCcLtj8smEx9Sqn-9KGHEtZE0eRcRmrRKR1U
+{
+  "chatId": 2,
+  "contenido": "Me siento muy de malgenio"
+}
+
+###
+###############################################
+# 🔵 2. CREAR MENSAJE POSITIVO
+###############################################
+POST http://localhost:3000/messages
 Content-Type: application/json
 
 {
   "userId": 1,
-  "wiseChatId": 2,
-  "content": "Me siento muy preocupado y ansioso hoy."
+  "wiseChatId": 1,
+  "content": "Hoy fue un día maravilloso, gracias por escucharme!"
 }
 
-### Obtener historial de mensajes
-GET http://localhost:3000/message/chat/2
+###
+###############################################
+# 🔵 3. CREAR MENSAJE NEUTRAL
+###############################################
+POST http://localhost:3000/messages
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "wiseChatId": 1,
+  "content": "Estoy organizando mis tareas"
+}
+
+###
+###############################################
+# 🔵 4. OBTENER MENSAJES DE UN CHAT
+###############################################
+GET http://localhost:3000/messages/chat/1
+
+###
+###############################################
+# 🔵 5. PRUEBA DIRECTA A HUGGINGFACE (OPCIONAL)
+###############################################
+POST {{HUGGINGFACE_API_URL}}
+Content-Type: application/json
+Authorization: Bearer {{HUGGINGFACE_API_KEY}}
+
+{
+  "inputs": "Estoy muy mal, necesito ayuda"
+}
+
+###
+###############################################
+# 🧪 6. PRUEBA RESPUESTA TINY LLAMA
+###############################################
+POST http://localhost:3000/messages
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiZXBlc2NhYWxmb25zb0BnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjM0NjkxNDgsImV4cCI6MTc2MzU1NTU0OH0.BcjKDRLRCcLtj8smEx9Sqn-9KGHEtZE0eRcRmrRKR1U
+
+{
+  "chatId": 1,
+  "contenido": "Tiny, ¿puedes responderme? Necesito saber si estás ahí"
+}
+
+# 👉 La respuesta HTTP incluirá `mensajeBot.content`
+#    con el texto generado por TinyLlamaService.
