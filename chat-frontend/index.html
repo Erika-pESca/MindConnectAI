@@ -421,10 +421,17 @@
             const [chats, setChats] = useState([]);
             const [currentChatId, setCurrentChatId] = useState(null);
             const [messages, setMessages] = useState([]);
+            const [messagesCache, setMessagesCache] = useState({}); // Caché para guardar mensajes de chats anteriores
             const [inputMessage, setInputMessage] = useState('');
             const [loading, setLoading] = useState(false);
             const [error, setError] = useState('');
             const messagesEndRef = useRef(null);
+            const currentChatIdRef = useRef(currentChatId);
+
+            // Mantener la referencia del chat actual actualizada
+            useEffect(() => {
+                currentChatIdRef.current = currentChatId;
+            }, [currentChatId]);
 
             const scrollToBottom = () => {
                 messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -443,21 +450,105 @@
 
             // Cargar mensajes cuando se selecciona un chat
             useEffect(() => {
-                if (currentChatId) {
-                    loadMessages();
-                }
+                let active = true;
+
+                const fetchMessages = async () => {
+                    if (!currentChatId) return;
+
+                    // 1. Intentar cargar desde caché primero para respuesta inmediata
+                    if (messagesCache[currentChatId]) {
+                        console.log('Cargando desde caché para chat:', currentChatId);
+                        setMessages(messagesCache[currentChatId]);
+                        setLoading(false);
+                    } else {
+                        setMessages([]);
+                        setLoading(true);
+                    }
+                    
+                    setError('');
+
+                    try {
+                        // 2. Siempre consultar al servidor para tener la última versión (background sync)
+                        console.log(`📡 Fetching messages for chat ${currentChatId}...`);
+                        const response = await fetch(`${API_URL}/messages/chat/${currentChatId}`, {
+                            headers: { 'Authorization': `Bearer ${token}` },
+                        });
+
+                        if (!response.ok) throw new Error('Error al cargar mensajes');
+
+                        const data = await response.json();
+                        console.log(`📥 Received ${data.length} messages for chat ${currentChatId}`);
+                        
+                        if (active) {
+                            const newMessages = data || [];
+                            
+                            // Log para depuración
+                            if (newMessages.length === 0 && messagesCache[currentChatId]?.length > 0) {
+                                console.warn(`⚠️ Server returned 0 messages but cache had ${messagesCache[currentChatId].length}. This is suspicious.`);
+                                // Si el servidor dice 0 pero teníamos caché, mantenemos la caché como fallback visual
+                                // Esto evita el "borrado" visual si el servidor falla en devolver datos
+                                if (messagesCache[currentChatId]?.length > 0) {
+                                    console.log('🛡️ Keeping cached messages due to suspicious empty response');
+                                    // No sobrescribimos con array vacío
+                                    setLoading(false);
+                                    return; 
+                                }
+                            }
+
+                            setMessages(newMessages);
+                            // Actualizar caché
+                            setMessagesCache(prev => ({
+                                ...prev,
+                                [currentChatId]: newMessages
+                            }));
+                        }
+                    } catch (err) {
+                        if (active) {
+                            console.error('Error:', err);
+                            // Si falló la red pero teníamos caché, no mostramos error, nos quedamos con lo viejo
+                            if (!messagesCache[currentChatId]) {
+                                setError('Error al cargar mensajes: ' + err.message);
+                            }
+                        }
+                    } finally {
+                        if (active) {
+                            setLoading(false);
+                        }
+                    }
+                };
+
+                fetchMessages();
+
+                return () => {
+                    active = false;
+                };
             }, [currentChatId, token]);
 
             const loadChats = async () => {
                 try {
-                    // En un caso real, tendrías un endpoint para obtener los chats del usuario
-                    // Por ahora, usaremos el chat actual o crearemos uno nuevo
-                    if (!currentChatId) {
-                        // Crear un chat por defecto si no existe
-                        await createChat();
+                    // Consultar los chats del usuario al backend
+                    const response = await fetch(`${API_URL}/wise-chat`, {
+                        headers: { 
+                            'Authorization': `Bearer ${token}` 
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        setChats(data);
+
+                        // Si hay chats y no hay uno seleccionado, seleccionar el más reciente
+                        if (data.length > 0 && !currentChatId) {
+                            setCurrentChatId(data[0].id);
+                        } 
+                        // Si no hay chats, crear uno nuevo automáticamente
+                        else if (data.length === 0 && !currentChatId) {
+                            await createChat();
+                        }
                     }
                 } catch (err) {
                     console.error('Error cargando chats:', err);
+                    setError('Error al cargar el historial de chats');
                 }
             };
 
@@ -470,7 +561,7 @@
                             'Authorization': `Bearer ${token}`,
                         },
                         body: JSON.stringify({
-                            nombre_chat: `Chat ${new Date().toLocaleDateString()}`,
+                            nombre_chat: `Chat ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
                             descripcion: 'Chat de prueba',
                         }),
                     });
@@ -478,31 +569,19 @@
                     if (!response.ok) throw new Error('Error al crear chat');
 
                     const chat = await response.json();
+                    setChats(prev => [chat, ...prev]);
+                    setMessages([]); // Chat nuevo inicia vacío
                     setCurrentChatId(chat.id);
                 } catch (err) {
                     setError('Error al crear chat: ' + err.message);
                 }
             };
 
-            const loadMessages = async () => {
-                if (!currentChatId) return;
-
-                try {
-                    const response = await fetch(`${API_URL}/messages/chat/${currentChatId}`, {
-                        headers: { 'Authorization': `Bearer ${token}` },
-                    });
-
-                    if (!response.ok) throw new Error('Error al cargar mensajes');
-
-                    const data = await response.json();
-                    setMessages(data || []);
-                } catch (err) {
-                    setError('Error al cargar mensajes: ' + err.message);
-                }
-            };
+            // loadMessages function removed as it is now inside useEffect
 
             const sendMessage = async () => {
-                if (!inputMessage.trim() || !currentChatId || loading) return;
+                const sendingChatId = currentChatId; // Capturar ID del chat al momento de enviar
+                if (!inputMessage.trim() || !sendingChatId || loading) return;
 
                 const messageText = inputMessage.trim();
                 setInputMessage('');
@@ -516,7 +595,17 @@
                     isBot: false,
                     creation_date: new Date().toISOString(),
                 };
-                setMessages((prev) => [...prev, userMessage]);
+                
+                // 1. Actualizar caché del chat específico (siempre)
+                setMessagesCache(prev => ({
+                    ...prev,
+                    [sendingChatId]: [...(prev[sendingChatId] || []), userMessage]
+                }));
+
+                // 2. Actualizar vista SOLO si seguimos en el mismo chat
+                if (sendingChatId === currentChatIdRef.current) {
+                    setMessages((prev) => [...prev, userMessage]);
+                }
 
                 try {
                     const response = await fetch(`${API_URL}/messages`, {
@@ -526,7 +615,7 @@
                             'Authorization': `Bearer ${token}`,
                         },
                         body: JSON.stringify({
-                            chatId: currentChatId,
+                            chatId: sendingChatId,
                             contenido: messageText,
                         }),
                     });
@@ -538,22 +627,44 @@
 
                     const data = await response.json();
 
-                    // Remover mensaje optimista y agregar los reales
-                    setMessages((prev) => {
-                        const filtered = prev.filter((m) => m.id !== userMessage.id);
+                    // Función helper para actualizar la lista de mensajes reemplazando el optimista
+                    const updateMessageList = (list) => {
+                        const filtered = (list || []).filter((m) => m.id !== userMessage.id);
                         return [...filtered, data.mensajeUsuario, data.mensajeBot];
-                    });
+                    };
 
-                    // Verificar en la consola que el bot respondió
-                    console.log('✅ Respuesta del bot recibida:', data.mensajeBot);
-                    console.log('📝 isBot:', data.mensajeBot.isBot);
-                    console.log('💬 Contenido:', data.mensajeBot.content);
+                    // 1. Actualizar caché con datos reales
+                    setMessagesCache(prev => ({
+                        ...prev,
+                        [sendingChatId]: updateMessageList(prev[sendingChatId])
+                    }));
+
+                    // 2. Actualizar vista SOLO si seguimos en el mismo chat
+                    if (sendingChatId === currentChatIdRef.current) {
+                        setMessages(prev => updateMessageList(prev));
+                        
+                        // Verificar en la consola
+                        console.log('✅ Respuesta recibida en chat', sendingChatId);
+                    }
                 } catch (err) {
-                    setError('Error: ' + err.message);
-                    // Remover mensaje optimista en caso de error
-                    setMessages((prev) => prev.filter((m) => m.id !== userMessage.id));
+                    // Revertir cambios en caso de error
+                    const revertList = (list) => (list || []).filter((m) => m.id !== userMessage.id);
+
+                    setMessagesCache(prev => ({
+                        ...prev,
+                        [sendingChatId]: revertList(prev[sendingChatId])
+                    }));
+
+                    if (sendingChatId === currentChatIdRef.current) {
+                        setMessages(prev => revertList(prev));
+                        setError('Error: ' + err.message);
+                    }
                 } finally {
-                    setLoading(false);
+                    // Solo desactivar loading si seguimos en el mismo chat
+                    // (si cambiamos, el nuevo chat manejará su propio loading)
+                    if (sendingChatId === currentChatIdRef.current) {
+                        setLoading(false);
+                    }
                 }
             };
 
@@ -570,6 +681,7 @@
                 setChats([]);
                 setCurrentChatId(null);
                 setMessages([]);
+                setMessagesCache({}); // Limpiar caché al salir
             };
 
             if (!token) {
@@ -606,8 +718,20 @@
                     ) : (
                         <>
                             <div className="chat-selector">
-                                <select value={currentChatId} onChange={(e) => setCurrentChatId(Number(e.target.value))}>
-                                    <option value={currentChatId}>Chat #{currentChatId}</option>
+                                <select 
+                                    value={currentChatId || ''} 
+                                    onChange={(e) => {
+                                        const newId = Number(e.target.value);
+                                        // Actualizar mensajes inmediatamente desde caché o limpiar para evitar flash de contenido anterior
+                                        setMessages(messagesCache[newId] || []);
+                                        setCurrentChatId(newId);
+                                    }}
+                                >
+                                    {chats.map(chat => (
+                                        <option key={chat.id} value={chat.id}>
+                                            Chat #{chat.id} - {chat.nombre_chat} ({new Date(chat.fecha_creacion).toLocaleDateString()})
+                                        </option>
+                                    ))}
                                 </select>
                                 <button className="create-chat-btn" onClick={createChat}>
                                     + Nuevo Chat

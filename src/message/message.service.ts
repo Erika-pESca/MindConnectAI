@@ -44,6 +44,8 @@ export class MessageService {
     if (!chat) throw new NotFoundException('Chat no encontrado');
     if (!user) throw new NotFoundException('Usuario no encontrado');
 
+    this.logger.log(`📝 Creando mensaje para Chat ID: ${chatId}, User ID: ${userId}`);
+
     // 3. Analizar sentimiento y generar respuesta con IA en un solo paso
     const iaResult: IaResponse =
       await this.iaService.generarRespuestaYAnalisis(contenido);
@@ -86,19 +88,25 @@ export class MessageService {
 
     // Log para verificar que se envió la respuesta
     this.logger.log(
-      `✅ Respuesta del bot enviada al usuario ${userId} en chat ${chatId}`,
+      `✅ Respuesta del bot enviada al usuario ${userId} en chat ${chatId}. ID Msj Usuario: ${mensajeUsuario.id}, ID Msj Bot: ${mensajeBot.id}`,
     );
-    this.logger.debug(
-      `📝 Contenido respuesta bot: ${mensajeBot.content.substring(0, 100)}...`,
-    );
-    this.logger.debug(
-      `💾 Mensaje bot guardado con ID: ${mensajeBot.id}, isBot: ${mensajeBot.isBot}`,
-    );
+    
+    // Verificar si se guardó la relación
+    // const verify = await this.messageRepo.findOne({ where: { id: mensajeUsuario.id }, relations: ['wiseChat'] });
+    // this.logger.debug(`🔍 Verificación post-save: Chat ID en mensaje: ${verify?.wiseChat?.id}`);
 
     // 6. Actualizar sentimiento global del chat
     chat.sentimiento_general = String(iaResult.sentimiento);
     chat.nivel_urgencia_general = String(iaResult.nivel_urgencia);
-    await this.chatRepo.save(chat);
+
+    // IMPORTANTE: No guardar 'chat' con sus relaciones aquí si no queremos sobrescribir messages
+    // TypeORM a veces borra relaciones OneToMany si no se cargan completas y se guarda el padre con cascade: true
+    
+    // Opción Segura: Actualizar solo los campos específicos del chat
+    await this.chatRepo.update(chat.id, {
+      sentimiento_general: chat.sentimiento_general,
+      nivel_urgencia_general: chat.nivel_urgencia_general
+    });
 
     return {
       ok: true,
@@ -112,6 +120,8 @@ export class MessageService {
    * Obtener todos los mensajes de un chat
    */
   async obtenerMensajesPorChat(chatId: number): Promise<Message[]> {
+    this.logger.log(`🔍 Solicitando mensajes para Chat ID: ${chatId} (Tipo: ${typeof chatId})`);
+    
     const chat = await this.chatRepo.findOne({
       where: { id: chatId },
     });
@@ -122,19 +132,19 @@ export class MessageService {
 
     const mensajes = await this.messageRepo.find({
       where: { wiseChat: { id: chatId } },
-      relations: ['user'],
+      relations: ['user', 'wiseChat'], // Agregado wiseChat para verificar
       order: {
         creation_date: 'ASC',
       },
     });
 
-    this.logger.debug(
-      `📬 Obtenidos ${mensajes.length} mensajes del chat ${chatId}`,
+    this.logger.log(
+      `📬 Obtenidos ${mensajes.length} mensajes del chat ${chatId} desde la DB`,
     );
-    const mensajesBot = mensajes.filter((m) => m.isBot);
-    this.logger.debug(
-      `🤖 Mensajes del bot: ${mensajesBot.length} de ${mensajes.length}`,
-    );
+
+    if (mensajes.length > 0) {
+        this.logger.debug(`Primer mensaje ID: ${mensajes[0].id}, Chat Relacionado ID: ${mensajes[0].wiseChat?.id}`);
+    }
 
     return mensajes;
   }

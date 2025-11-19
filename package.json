@@ -93,6 +93,13 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^@xenova/transformers$": "<rootDir>/../__mocks__/xenova-transformers.js",
+      "^src/(.*)$": "<rootDir>/$1"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!@xenova)"
+    ]
   }
 }
