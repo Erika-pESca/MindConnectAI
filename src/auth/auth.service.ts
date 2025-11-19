@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -18,15 +17,16 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 
 import { MailerService } from '@nestjs-modules/mailer';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
-
     private readonly jwtService: JwtService,
     private readonly mailerService: MailerService,
+    private readonly configService: ConfigService,
   ) {}
 
   // ------------------------
@@ -47,7 +47,7 @@ export class AuthService {
       name: dto.name,
       email: dto.email,
       password: hashedPassword,
-      role: dto.role || 'user', // admin | moderador | user
+      role: dto.role || 'user',
     });
 
     await this.userRepo.save(newUser);
@@ -63,7 +63,7 @@ export class AuthService {
   // ------------------------
   async login(dto: LoginDto) {
     const user = await this.userRepo.findOne({
-      where: { email: dto.email },
+      where: { name: dto.name },
     });
 
     if (!user) throw new NotFoundException('Usuario no encontrado');
@@ -71,7 +71,6 @@ export class AuthService {
     const isValid = await bcrypt.compare(dto.password, user.password);
     if (!isValid) throw new UnauthorizedException('Contraseña incorrecta');
 
-    // IMPORTANTE → Usar sub para que JWT Strategy funcione
     const token = this.jwtService.sign({
       sub: user.id,
       email: user.email,
@@ -105,15 +104,16 @@ export class AuthService {
       { expiresIn: '30m' },
     );
 
-    const resetLink = `http://localhost:3000/auth/reset-password?token=${token}`;
+    const frontend = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+    const resetLink = `${frontend.replace(/\/$/, '')}/reset-password.html?token=${token}`;
 
     await this.mailerService.sendMail({
       to: user.email,
       subject: 'Recuperación de contraseña',
-      template: './reset-password', // nombre del template SIN .hbs
+      template: './reset-password',
       context: {
-        name: user.name, // 👈 Debe coincidir con {{name}}
-        resetLink: resetLink, // 👈 Debe coincidir con {{resetLink}}
+        name: user.name,
+        resetLink: resetLink,
       },
     });
 

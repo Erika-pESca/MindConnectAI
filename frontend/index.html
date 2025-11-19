@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login / Registro - MindConnectAI</title>
+
+  <!-- Tailwind conexion con la libreria-->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts - Fuentes -->
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+  /* aplicacion de custom properties  */
+  :root{
+    /* Paleta de colores: violeta y verde */
+    --primary: #7B6BEA; 
+    --primary-2: #9D86FF;
+    --accent: #70D6A5;
+    --accent-dark: #4CC07A;
+
+    /* Backgrounds */
+    --bg-start: #f3f6ff;
+    --bg-end: #f6fbf7;
+
+    /* Texto */
+    --panel-start: var(--primary);
+    --panel-end: var(--primary-2);
+    --panel-text: #ffffff;
+    --panel-text-shadow: 0 2px 6px rgba(0,0,0,0.18);
+
+    --form-bg: #ffffff;
+    --form-card-bg: #ffffff;
+    --form-input-bg: #fbfdff;
+
+    /* Botones contorno */
+    --btn-text: #ffffff;
+    --btn-shadow-rgb: 76,192,122;
+
+    --muted: #f6f7fb;
+    /* altura del contenedor principal */
+    --container-height: 720px;
+  }
+
+  body { 
+    font-family: 'Quicksand', sans-serif;
+    background: linear-gradient(135deg, #f3f6ff 0%, #f6fbf7 100%); 
+  }
+  /* transición base para panel y formulario */
+  .slide-panel { 
+    transition: transform 0.8s cubic-bezier(.2,.9,.2,1), z-index 0s;
+    background: linear-gradient(135deg, var(--panel-start), var(--panel-end)); 
+    color: var(--panel-text); 
+  }
+  .forms-wrap { 
+    transition: transform 0.8s cubic-bezier(.2,.9,.2,1), z-index 0s; 
+  }
+
+  /* estado "swap": mueve el panel a la derecha y los formularios a la izquierda */
+  .outer-container.swap .slide-panel { transform: translateX(100%); }
+  .outer-container.swap .forms-wrap { transform: translateX(-100%); }
+
+  /* Mantener el logo flotando */
+  .puzzle-anim { animation: floatPuzzle 4s ease-in-out infinite; }
+  @keyframes floatPuzzle { 0%,100%{ transform: translateY(0) rotate(0deg); } 50%{ transform: translateY(-12px) rotate(2deg); } }
+
+  /* Por defecto queremos que el panel izquierdo quede por encima del área de formularios */
+  .slide-panel { z-index: 20; }
+  .forms-wrap { z-index: 10; }
+  /* Cuando hacemos swap, cambiamos el orden para que el área de formularios quede por encima */
+  .outer-container.swap .slide-panel { z-index: 10; }
+  .outer-container.swap .forms-wrap { z-index: 20; }
+
+  /* Asegurar legibilidad del texto dentro del panel */
+  .slide-panel h2, .slide-panel p { text-shadow: var(--panel-text-shadow); }
+
+  /* Formularios */
+  .form-card {
+    width: 100%;
+    max-width: 480px;
+    background: #ffffff;
+    padding: 20px;
+    box-shadow: none;
+    box-sizing: border-box;
+    border-radius: 12px;
+  }
+  .form-card label { color: #374151; font-size: 1rem; }
+  .form-card input { background: #fbfdff; }
+  .form-actions { margin-top: 8px; }
+
+  /* Botones y toggles */
+  .primary-btn { background: var(--accent); color: #fff; border: none; box-shadow: 0 8px 20px rgba(76,192,122,0.12); transition: background .18s ease; }
+  .primary-btn:hover { background: var(--accent-dark); }
+  .primary-btn[disabled] { opacity: 0.6; cursor: not-allowed; }
+  .pwd-toggle { background: transparent; border: none; color: var(--primary); font-weight: 600; cursor: pointer; }
+  .toggle-btn { transition: all .15s ease; background: transparent; color: #374151; border: none; }
+  .toggle-btn.active { background: var(--primary); color: #fff; box-shadow: none; }
+    
+  </style>
+</head>
+
+<!-- Estructura html aplicando diseño de componentes con tailwind  -->
+<body class="min-h-screen flex items-center justify-center p-6">
+
+  <div class="relative w-full max-w-7xl bg-white rounded-3xl shadow-2xl overflow-hidden outer-container" style="height:var(--container-height);">
+
+    <!-- PANEL VIOLETA -->
+    <div id="slidePanel" class="slide-panel absolute top-0 left-0 w-1/2 h-full text-white flex flex-col items-center justify-center p-14">
+
+      <h2 id="slideTitle" class="text-4xl font-bold mb-6">¡Bienvenido a MindConnectAI!</h2>
+      <div id="slideContent" class="text-center text-lg opacity-90 space-y-3 max-w-[28rem]">
+        <p class="leading-relaxed font-medium">🧩💆‍♀️Tu mente tiene un lugar para conectar. 💆‍♂️🧩</p>
+        <p class="leading-relaxed">Encuentra calma y apoyo incondicional. Nuestra inteligencia artificial está aquí, lista para escucharte sin juicios, cada vez que necesites hablar.</p>
+      </div>
+
+      <!-- Logo -->
+      <div class="w-64 h-64 md:w-68 md:h-68 mt-10 puzzle-anim">
+        <!-- Imagen del imagotipo -->
+        <div class="w-full h-full bg-white/30 rounded-xl flex items-center justify-center text-center">
+          <img src="assets/imagotipo.png" alt="Imagotipo" class="max-w-full max-h-full object-contain" />
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENEDOR FORMULARIOS -->
+    <div class="absolute right-0 top-0 w-1/2 h-full overflow-hidden bg-white p-0 forms-wrap">
+
+      <!-- Centro -->
+      <div class="h-full flex items-center justify-center">
+        <div class="w-full max-w-lg flex flex-col items-center gap-3 px-6">
+
+          <!-- Toggle botones -->
+          <div class="flex bg-gray-100 rounded-xl p-1 w-full max-w-md">
+            <button id="btnLogin" class="toggle-btn flex-1 py-3 px-4 rounded-lg font-semibold">Login</button>
+            <button id="btnRegister" class="toggle-btn flex-1 py-3 px-4 rounded-lg font-semibold">Registro</button>
+          </div>
+
+          <!-- Slider de formularios -->
+          <div id="formSlider" class="flex w-[200%] transition-all duration-700 ease-in-out">
+
+            <!-- FORMULARIO DE LOGIN -->
+            <div class="min-w-full flex items-center justify-center px-4 box-border">
+              <div class="form-card">
+                <form id="loginForm" class="space-y-4">
+                  <div>
+                    <div class="mb-2 flex justify-center">
+                      <img src="assets/Logo-completo-fondo-blanco.png" alt="Logo" class="h-40  object-contain" />
+                    </div>
+                    
+                    <label class="block text-base font-medium">Usuario</label>
+                    <input id="loginUser" type="text" class="w-full mt-3 p-4 rounded-xl border" placeholder="Tu usuario" />
+                  </div>
+                  <div>
+                    <div class="flex items-center justify-between">
+                      <label class="block text-base font-medium">Contraseña</label>
+                      <!-- Ver y ocultar contraseña -->
+                      <button type="button" id="loginTogglePwd" class="pwd-toggle text-sm">Mostrar</button>
+                    </div>
+                    <input id="loginPassword" type="password" class="w-full mt-3 p-4 rounded-xl border" placeholder="••••••" />
+                    <div class="text-right mt-2">
+                      <a href="#" id="forgotPassword" style="color:var(--accent-dark);" class="text-sm hover:underline">¿Olvidaste tu contraseña?</a>
+                    </div>
+                  </div>
+                  <div id="loginMessage" class="text-sm text-center text-red-600 mb-2"></div>
+                  <div class="form-actions">
+                    <button id="loginSubmit" type="submit" class="w-full py-4 text-lg primary-btn rounded-xl">Ingresar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- FORMULARIO DE REGISTRO -->
+            <div class="min-w-full flex items-center justify-center px-4 box-border">
+              <div class="form-card">
+                <form id="registerForm" class="space-y-4">
+                  <div>
+                    <label class="block text-base font-medium">Nombre</label>
+                    <input type="text" class="w-full mt-3 p-4 rounded-xl border" placeholder="Tu nombre" />
+                  </div>
+                  <div>
+                    <label class="block text-base font-medium">Email</label>
+                    <input type="email" class="w-full mt-3 p-4 rounded-xl border" placeholder="correo@example.com" />
+                  </div>
+                  <div>
+                    <label class="block text-base font-medium">Contraseña</label>
+                    <input type="password" id="regPassword" class="w-full mt-3 p-4 rounded-xl border" placeholder="••••••" />
+                  </div>
+                  <div>
+                    <div class="flex items-center justify-between">
+                      <label class="block text-base font-medium">Confirmar Contraseña</label>
+                      <button type="button" id="regTogglePwd" class="pwd-toggle text-sm">Mostrar</button>
+                    </div>
+                    <input type="password" id="regConfirmPassword" class="w-full mt-3 p-4 rounded-xl border" placeholder="••••••" />
+                  </div>
+                  <div class="flex items-start gap-3 mt-2">
+                    <input type="checkbox" id="termsCheckbox" class="mt-1" />
+                    <label for="termsCheckbox" class="text-sm">Acepto los <a href="#" class="underline" target="_blank">Términos y Condiciones</a> y el tratamiento de datos personales.</label>
+                  </div>
+                  <div id="registerMessage" class="text-sm text-center text-red-600 mb-2"></div>
+                  <div class="form-actions">
+                    <button id="registerSubmit" type="submit" class="w-full py-4 text-lg primary-btn rounded-xl">Crear cuenta</button>
+                  </div>
+                </form>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- USO DE SCRIPTS - logica de animacion  -->
+  <script>
+    const container = document.querySelector('.outer-container');
+    const formSlider = document.getElementById("formSlider");
+
+    const btnLogin = document.getElementById("btnLogin");
+    const btnRegister = document.getElementById("btnRegister");
+
+    // LOGIN / REGISTER ANIMACION
+    btnLogin.onclick = () => {
+      container.classList.remove('swap');
+      formSlider.style.transform = "translateX(0%)";
+
+      btnLogin.classList.add('active');
+      btnRegister.classList.remove('active');
+
+      document.getElementById("slideTitle").innerText = "¡Bienvenido a MindConnectAI!";
+      document.getElementById("slideContent").innerHTML = `
+        <p class="leading-relaxed font-medium">Tu mente tiene un lugar para conectar.</p>
+        <p class="leading-relaxed">Encuentra calma y apoyo incondicional. Nuestra inteligencia artificial está aquí, lista para escucharte sin juicios, cada vez que necesites hablar.</p>
+      `;
+    };
+
+    btnRegister.onclick = () => {
+      container.classList.add('swap');
+      formSlider.style.transform = "translateX(-100%)";
+
+      btnRegister.classList.add('active');
+      btnLogin.classList.remove('active');
+
+      document.getElementById("slideTitle").innerText = "Regístrate";
+      document.getElementById("slideContent").innerHTML = `
+        <p class="text-lg font-semibold">MindConnectAI: ¡Crea tu Espacio de Calma!</p>
+        <p class="leading-relaxed mt-2">Tu proceso de registro es rápido y totalmente confidencial. En menos de un minuto, estarás listo/a para comunicarte con tu IA de apoyo.</p>
+      `;
+    };
+
+    // Modal HTML para el enlace de "Olvidé mi contraseña" 
+    const forgotModalHtml = `
+      <div id="forgotModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md">
+          <h3 class="text-lg font-semibold mb-2">Recuperar contraseña</h3>
+          <p class="text-sm mb-4">Introduce el email con el que te registraste. Te enviaremos un enlace para restablecer tu contraseña.</p>
+          <input id="forgotEmail" type="email" class="w-full p-3 rounded border mb-2" placeholder="correo@example.com" />
+          <div id="forgotError" class="text-sm text-red-600 mb-2"></div>
+          <div id="forgotSuccess" class="text-sm text-green-600 mb-2"></div>
+          <div class="flex gap-3 mt-4">
+            <button id="forgotSubmit" class="primary-btn py-2 px-4 rounded">Enviar</button>
+            <button id="forgotClose" class="py-2 px-4 rounded border">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', forgotModalHtml);
+
+    // Validaciones de campos
+    const forgotLink = document.getElementById('forgotPassword');
+    const forgotModal = document.getElementById('forgotModal');
+    const forgotClose = document.getElementById('forgotClose');
+    const forgotSubmit = document.getElementById('forgotSubmit');
+    const forgotEmail = document.getElementById('forgotEmail');
+    const forgotError = document.getElementById('forgotError');
+    const forgotSuccess = document.getElementById('forgotSuccess');
+
+    function openForgot(e) { if (e) e.preventDefault(); if (forgotModal) forgotModal.classList.remove('hidden'); if (forgotEmail) { forgotEmail.value = ''; forgotEmail.focus(); } if (forgotError) forgotError.textContent=''; if (forgotSuccess) forgotSuccess.textContent=''; }
+    function closeForgot() { if (forgotModal) forgotModal.classList.add('hidden'); }
+    if (forgotLink) forgotLink.addEventListener('click', openForgot);
+    if (forgotClose) forgotClose.addEventListener('click', closeForgot);
+
+    if (forgotSubmit) {
+      forgotSubmit.addEventListener('click', async () => {
+        if (!forgotEmail) return;
+        const emailVal = forgotEmail.value.trim();
+        forgotError.textContent = '';
+        forgotSuccess.textContent = '';
+        if (!emailVal) { forgotError.textContent = 'Introduce tu email.'; return }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) { forgotError.textContent = 'Introduce un email válido.'; return }
+        try {
+          const res = await fetch('http://localhost:3000/auth/forgot-password', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: emailVal })
+          });
+          const data = await res.json();
+          if (!res.ok) { forgotError.textContent = data.message || 'Error al enviar correo.'; return }
+          forgotSuccess.textContent = data.message || 'Correo enviado. Revisa tu bandeja.';
+          setTimeout(() => closeForgot(), 2000);
+        } catch (err) {
+          console.error(err);
+          forgotError.textContent = 'Error de red. Intenta nuevamente.';
+        }
+      });
+    }
+
+    // Mensajes de errores 
+    function showMessage(id, text, isError = true) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = text;
+      el.style.color = isError ? 'rgb(220 38 38)' : 'rgb(16 185 129)';
+      el.style.display = text ? 'block' : 'none';
+    }
+
+    function validEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+    function validPassword(pw) {
+      return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(pw);
+    }
+
+    // Register flow
+    const registerFormEl = document.getElementById('registerForm');
+    if (registerFormEl) {
+      registerFormEl.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        showMessage('registerMessage', '');
+
+        const name = registerFormEl.querySelector('input[placeholder="Tu nombre"]').value.trim();
+        const email = registerFormEl.querySelector('input[placeholder="correo@example.com"]').value.trim();
+        const password = document.getElementById('regPassword').value;
+        const confirm = document.getElementById('regConfirmPassword').value;
+        const terms = document.getElementById('termsCheckbox').checked;
+
+        if (name.length < 2) return showMessage('registerMessage', 'El nombre debe tener al menos 2 caracteres.');
+        if (!validEmail(email)) return showMessage('registerMessage', 'Introduce un email válido.');
+        if (!validPassword(password)) return showMessage('registerMessage', 'La contraseña debe tener mínimo 8 caracteres, incluir mayúscula, minúscula y número.');
+        if (password !== confirm) return showMessage('registerMessage', 'Las contraseñas no coinciden.');
+        if (!terms) return showMessage('registerMessage', 'Debes aceptar los términos y el tratamiento de datos para registrarte.');
+
+        try {
+          const res = await fetch('http://localhost:3000/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password }),
+          });
+          const data = await res.json();
+          if (!res.ok) return showMessage('registerMessage', data.message || 'Error al registrarse.');
+
+          showMessage('registerMessage', 'Registro exitoso. Redirigiendo al login...', false);
+          // Ensure all fields are cleared and messages reset
+          registerFormEl.reset();
+          // also clear any remaining input values explicitly (robust reset)
+          Array.from(registerFormEl.querySelectorAll('input')).forEach(i => i.value = '');
+          const checkbox = document.getElementById('termsCheckbox'); if (checkbox) checkbox.checked = false;
+          try { if (typeof updateRegisterState === 'function') updateRegisterState(); } catch(e){}
+          setTimeout(() => {
+            btnLogin.click();
+            // show success on login form and clear any previous messages
+            showMessage('registerMessage', '');
+            showMessage('loginMessage', 'Registro exitoso. Por favor, inicia sesión.', false);
+          }, 900);
+        } catch (err) {
+          console.error(err);
+          showMessage('registerMessage', 'Error de red. Intenta nuevamente.');
+        }
+      });
+    }
+
+    // Mensajes de validacion en login
+    const loginFormEl = document.getElementById('loginForm');
+    if (loginFormEl) {
+      loginFormEl.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        showMessage('loginMessage', '');
+
+        const name = loginFormEl.querySelector('input[placeholder="Tu usuario"]').value.trim();
+        const password = loginFormEl.querySelector('input[placeholder="••••••"]').value;
+
+        if (!name) return showMessage('loginMessage', 'Introduce tu usuario.');
+        if (!password || password.length < 6) return showMessage('loginMessage', 'Contraseña inválida.');
+
+        try {
+          const res = await fetch('http://localhost:3000/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, password }),
+          });
+          const data = await res.json();
+          if (!res.ok) return showMessage('loginMessage', data.message || 'Error en login.');
+
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          window.location.href = 'welcome.html';
+        } catch (err) {
+          console.error(err);
+          showMessage('loginMessage', 'Error de red. Intenta de nuevo.');
+        }
+      });
+    }
+
+    // Mostar / ocultar contraseñas y validaciones en tiempo real
+    const loginUserEl = document.getElementById('loginUser');
+    const loginPasswordEl = document.getElementById('loginPassword');
+    const loginSubmitBtn = document.getElementById('loginSubmit');
+
+    const regNameEl = registerFormEl ? registerFormEl.querySelector('input[placeholder="Tu nombre"]') : null;
+    const regEmailEl = registerFormEl ? registerFormEl.querySelector('input[placeholder="correo@example.com"]') : null;
+    const regPasswordEl = document.getElementById('regPassword');
+    const regConfirmEl = document.getElementById('regConfirmPassword');
+    const regTermsEl = document.getElementById('termsCheckbox');
+    const regSubmitBtn = document.getElementById('registerSubmit');
+    const regToggleBtn = document.getElementById('regTogglePwd');
+
+    function updateLoginState() {
+      try {
+        const ok = loginUserEl && loginUserEl.value.trim().length > 0 && loginPasswordEl && loginPasswordEl.value.length >= 6;
+        return ok;
+      } catch (e) { return false; }
+    }
+
+    function updateRegisterState() {
+      try {
+        const nameOk = regNameEl && regNameEl.value.trim().length >= 2;
+        const emailOk = regEmailEl && validEmail(regEmailEl.value.trim());
+        const pwOk = regPasswordEl && validPassword(regPasswordEl.value);
+        const match = regPasswordEl && regConfirmEl && regPasswordEl.value === regConfirmEl.value;
+        const termsOk = regTermsEl && regTermsEl.checked;
+        const ok = nameOk && emailOk && pwOk && match && termsOk;
+        return ok;
+      } catch (e) { return false; }
+    }
+
+    if (loginUserEl) loginUserEl.addEventListener('input', updateLoginState);
+    if (loginPasswordEl) loginPasswordEl.addEventListener('input', updateLoginState);
+
+    if (regNameEl) regNameEl.addEventListener('input', updateRegisterState);
+    if (regEmailEl) regEmailEl.addEventListener('input', updateRegisterState);
+    if (regPasswordEl) regPasswordEl.addEventListener('input', updateRegisterState);
+    if (regConfirmEl) regConfirmEl.addEventListener('input', updateRegisterState);
+    if (regTermsEl) regTermsEl.addEventListener('change', updateRegisterState);
+
+    if (regToggleBtn) {
+      regToggleBtn.addEventListener('click', () => {
+        const showing = regPasswordEl && regPasswordEl.type === 'text';
+        const newType = showing ? 'password' : 'text';
+        if (regPasswordEl) regPasswordEl.type = newType;
+        if (regConfirmEl) regConfirmEl.type = newType;
+        regToggleBtn.textContent = showing ? 'Mostrar' : 'Ocultar';
+      });
+    }
+
+    const loginToggleBtn = document.getElementById('loginTogglePwd');
+    if (loginToggleBtn) {
+      loginToggleBtn.addEventListener('click', () => {
+        const showing = loginPasswordEl && loginPasswordEl.type === 'text';
+        const newType = showing ? 'password' : 'text';
+        if (loginPasswordEl) loginPasswordEl.type = newType;
+        loginToggleBtn.textContent = showing ? 'Mostrar' : 'Ocultar';
+      });
+    }
+
+    // inicializar estados
+    updateLoginState();
+    updateRegisterState();
+
+    // inicializar estado por defecto
+    btnLogin.click();
+  </script>
+
+</body>
+</html>

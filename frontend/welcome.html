@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bienvenido - MindConnectAI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Quicksand', sans-serif; background: linear-gradient(135deg,#f3f6ff 0%,#f6fbf7 100%); height:100vh; display:flex; align-items:center; justify-content:center; }
+    .card { background:#fff; padding:28px; border-radius:12px; box-shadow:0 10px 30px rgba(2,6,23,0.06); width:100%; max-width:720px; text-align:center }
+    .btn { background:#70D6A5; color:#fff; padding:10px 16px; border-radius:10px; border:none; cursor:pointer }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 id="welcomeTitle">Bienvenido/a</h1>
+    <p id="welcomeSubtitle" style="color:#374151; margin-top:8px"></p>
+    <div style="margin-top:20px">
+      <button id="btnLogout" class="btn">Cerrar sesión</button>
+    </div>
+  </div>
+
+  <script>
+    const userRaw = localStorage.getItem('user');
+    let name = '';
+    if (userRaw) {
+      try { const u = JSON.parse(userRaw); name = u.name || u.email || 'usuario'; }
+      catch(e) { name = userRaw }
+    }
+    document.getElementById('welcomeTitle').innerText = `Bienvenido/a, ${name}!`;
+    document.getElementById('welcomeSubtitle').innerText = 'Has iniciado sesión correctamente.';
+
+    document.getElementById('btnLogout').addEventListener('click', ()=>{
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>
