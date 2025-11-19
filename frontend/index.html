@@ -393,7 +393,7 @@
           localStorage.setItem('token', data.token);
           localStorage.setItem('user', JSON.stringify(data.user));
           // Redirigir al chat
-          window.location.href = '../chat-frontend/chat.html';
+          window.location.href = '/chat-frontend/chat.html';
         } catch (err) {
           console.error(err);
           showMessage('loginMessage', 'Error de red. Intenta de nuevo.');

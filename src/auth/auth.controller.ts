@@ -34,14 +34,14 @@ export class AuthController {
   @Get('reset-password')
   getResetPassword(@Query('token') token: string, @Res() res: Response) {
     if (!token) {
-      // Intentar ambas rutas posibles dependiendo de dónde esté corriendo el servidor
-      return res.redirect('http://localhost:8080/frontend/index.html?error=token_invalido');
+      // Si no hay token, redirigir al login con error
+      return res.redirect('http://localhost:3000/index.html?error=token_invalido');
     }
     
     try {
-      // Usar URL absoluta del frontend para evitar problemas con variables de entorno
-      // El servidor HTTP puede estar corriendo desde MindConnectAI/ o desde MindConnectAI/frontend/
-      const frontendUrl = 'http://localhost:8080';
+      // El servidor HTTP está corriendo desde MindConnectAI/frontend/
+      // Por lo tanto, los archivos se sirven directamente sin el prefijo /frontend/
+      const frontendUrl = 'http://localhost:3000';
       
       // Decodificar el token si viene codificado (puede venir doble codificado desde el correo)
       let decodedToken = token;
@@ -52,20 +52,19 @@ export class AuthController {
         decodedToken = token;
       }
       
-      // Intentar primero con la ruta /frontend/ (si el servidor está en la raíz)
-      // Si el servidor está corriendo desde frontend/, entonces la ruta sería directa
-      // Probamos primero con /frontend/ que es el caso más común
-      const dest = `${frontendUrl}/frontend/reset-password.html?token=${encodeURIComponent(decodedToken)}`;
+      // Construir la URL del formulario de reset con el token en el hash (#) para ocultarlo de la URL visible
+      // El hash no se envía al servidor, pero JavaScript puede leerlo del lado del cliente
+      const dest = `${frontendUrl}/reset-password.html#token=${encodeURIComponent(decodedToken)}`;
       
       // Log para depuración (remover en producción)
-      console.log('Redirigiendo a:', dest);
+      console.log('Redirigiendo a:', dest.replace(/#token=.*/, '#token=***'));
       console.log('Token recibido:', token.substring(0, 30) + '...');
       
       return res.redirect(dest);
     } catch (error) {
       console.error('Error al redirigir:', error);
-      // En caso de error, redirigir con token codificado directamente a la ruta con /frontend/
-      const dest = `http://localhost:8080/frontend/reset-password.html?token=${encodeURIComponent(token)}`;
+      // En caso de error, redirigir con token codificado directamente en el hash
+      const dest = `http://localhost:3000/reset-password.html#token=${encodeURIComponent(token)}`;
       return res.redirect(dest);
     }
   }

@@ -608,7 +608,7 @@
                 const storedToken = localStorage.getItem('token');
                 if (!storedToken) {
                     // Redirigir al login de frontend si no hay token
-                    window.location.href = '../frontend/index.html';
+                    window.location.href = '/index.html';
                 }
             }, []);
 
@@ -616,7 +616,7 @@
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
                 // Redirigir al login de frontend
-                window.location.href = '../frontend/index.html';
+                window.location.href = '/index.html';
             };
 
             // Si no hay token, no renderizar nada (se redirigirá)
