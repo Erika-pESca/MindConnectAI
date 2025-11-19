@@ -607,16 +607,16 @@
             useEffect(() => {
                 const storedToken = localStorage.getItem('token');
                 if (!storedToken) {
-                    // Redirigir al login de frontend si no hay token
-                    window.location.href = '/index.html';
+                    // Redirigir al login de frontend si no hay token usando la URL completa del servidor
+                    window.location.href = 'http://localhost:3000/index.html';
                 }
             }, []);
 
             const handleLogout = () => {
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
-                // Redirigir al login de frontend
-                window.location.href = '/index.html';
+                // Redirigir al login de frontend usando la URL completa del servidor
+                window.location.href = 'http://localhost:3000/index.html';
             };
 
             // Si no hay token, no renderizar nada (se redirigirá)
@@ -640,7 +640,7 @@
                             <h1>🤖 MindConnect AI</h1>
                             <div className="chat-status">
                                 <div className="status-dot"></div>
-                                <span>Conectado como {user?.email}</span>
+                                <span>Conectado como {user?.name || user?.email}</span>
                             </div>
                         </div>
                         <button onClick={handleLogout} style={{ background: '#ef4444' }}>
