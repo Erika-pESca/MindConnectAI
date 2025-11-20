@@ -6,7 +6,7 @@ import { WiseChat } from './entities/wise-chat.entity';
 import { Historial } from '../historial/entities/historial.entity';
 import { CreateWiseChatDto } from './dto/create-wise-chat.dto';
 import { UpdateWiseChatDto } from './dto/update-wise-chat.dto';
-import { TinyLlamaService } from '../ia/tinyllama.service';
+import { IaService } from '../ia/ia.service';
 import { MessageService } from '../message/message.service';
 import { Message } from '../message/entities/message.entity';
 
@@ -19,7 +19,7 @@ export class WiseChatService {
     private readonly messageRepository: Repository<Message>,
     @InjectRepository(Historial)
     private readonly historialRepo: Repository<Historial>,
-    private readonly tinyLlamaService: TinyLlamaService,
+    private readonly iaService: IaService,
     private readonly messageService: MessageService,
   ) {}
 
@@ -98,17 +98,16 @@ export class WiseChatService {
     // await this.messageService.create({ ... });
 
     // Llama al servicio de IA para obtener el análisis y la respuesta
-    const iaResult = await this.tinyLlamaService.analyzeAndRespond(
-      data.message,
-    );
+    const analisis = await this.iaService.analizarSentimiento(data.message);
+    const respuesta = await this.iaService.generarRespuesta(data.message, analisis);
 
     // Aquí también puedes guardar la respuesta de la IA en la base de datos
     // await this.messageService.create({ ... });
 
     return {
       user: 'IA',
-      text: iaResult.response,
-      sentiment: iaResult.sentiment,
+      text: respuesta.respuesta,
+      sentiment: respuesta.sentimiento,
       timestamp: new Date(),
     };
   }

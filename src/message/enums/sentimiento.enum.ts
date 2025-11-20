@@ -1,6 +1,6 @@
 export enum Sentimiento {
   POSITIVO = 'positivo',
-  NEUTRAL = 'neutral',
   NEGATIVO = 'negativo',
+  NEUTRAL = 'neutral',
   DESCONOCIDO = 'desconocido',
 }

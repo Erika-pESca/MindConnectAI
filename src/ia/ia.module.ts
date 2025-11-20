@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
-import { HuggingFaceService } from './huggingface.service';
-import { TinyLlamaService } from './tinyllama.service';
-import { GroqService } from './groq.service';
 import { IaService } from './ia.service';
+import { GroqService } from './groq.service';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  providers: [HuggingFaceService, TinyLlamaService, GroqService, IaService],
-  exports: [TinyLlamaService, GroqService, IaService],
+  imports: [ConfigModule],
+  providers: [IaService, GroqService],
+  exports: [IaService],
 })
 export class IaModule {}
+

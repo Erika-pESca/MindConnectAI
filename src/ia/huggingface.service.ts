@@ -51,7 +51,7 @@ export class HuggingFaceService {
       sentimiento: Sentimiento.NEUTRAL,
       nivel_urgencia: NivelUrgencia.NORMAL,
       puntaje_urgencia: 2,
-      emoji_reaccion: null,
+      emoji_reaccion: undefined,
       respuesta: '',
     };
   }

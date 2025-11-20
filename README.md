@@ -1,102 +1,204 @@
-<<<<<<< HEAD
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# MindConnectAI 🧠💬
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+**MindConnectAI** es una plataforma de backend inteligente construida con **NestJS** que revoluciona la mensajería tradicional integrando capacidades avanzadas de **Inteligencia Artificial**. El sistema no solo transmite mensajes, sino que los **comprende**, analiza su sentimiento y urgencia en tiempo real, y genera respuestas contextuales automáticas.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🌟 Características Principales
 
-## Description
+### 1. 🔐 Autenticación y Seguridad
+*   **JWT Strategy**: Protección de rutas mediante JSON Web Tokens.
+*   **Recuperación de Contraseña**: Flujo completo de "Olvidé mi contraseña" con tokens de un solo uso enviados vía correo electrónico (`Nodemailer` + `Handlebars`).
+*   **Roles de Usuario**: Estructura base para gestión de permisos (User/Admin).
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### 2. 🤖 Mensajería Inteligente (Core IA)
+Cada mensaje enviado por un usuario pasa por un pipeline de procesamiento:
+1.  **Análisis de Sentimiento**: Clasificación automática (Positivo, Negativo, Neutral).
+2.  **Detección de Urgencia**: Cálculo de un `puntaje_urgencia` (0-3) para priorizar la atención. Si la urgencia es alta (>= 3), se dispara una alerta (`alerta_disparada`).
+3.  **Reacción Automática**: Asignación de emojis (`emoji_reaccion`) basados en el tono del mensaje.
+4.  **Respuesta Generativa**: Un Bot integrado genera una respuesta inmediata y coherente basada en el contenido y el análisis previo.
 
-## Project setup
+### 3. 💬 Sesiones "WiseChat"
+*   Gestión de conversaciones persistentes.
+*   Cálculo dinámico del **Estado Emocional del Chat**: El sistema actualiza el `sentimiento_general` y `nivel_urgencia_general` de la conversación con cada interacción.
 
+## 🏗 Arquitectura del Sistema
+
+El proyecto utiliza una arquitectura modular escalable.
+
+### 📂 Estructura de Módulos
+
+| Módulo | Responsabilidad |
+| :--- | :--- |
+| **AppModule** | Orquestador principal, configuración de DB y variables de entorno. |
+| **AuthModule** | Endpoints de Login, Registro y Reset Password. |
+| **UserModule** | CRUD de usuarios y gestión de perfiles. |
+| **MessageModule** | Lógica central de mensajería. Orquesta la interacción entre la BD y el servicio de IA. |
+| **WiseChatModule** | Agrupación de mensajes en sesiones de chat. |
+| **IaModule** | Servicio transversal que provee la inteligencia (Análisis NLP + Generación de Texto). |
+| **HistorialModule** | Registro de auditoría y actividad. |
+| **NotificationModule** | Sistema de notificaciones (Email). |
+
+### 📡 API Endpoints
+
+#### Autenticación (`/auth`)
+*   `POST /auth/register`: Registro de nuevos usuarios.
+*   `POST /auth/login`: Inicio de sesión (retorna JWT).
+*   `POST /auth/forgot-password`: Solicitar correo de recuperación.
+*   `POST /auth/reset-password`: Establecer nueva contraseña con token.
+
+#### Usuarios (`/users`)
+*   `GET /users`: Listar usuarios.
+*   `GET /users/:id`: Obtener perfil.
+*   `PATCH /users/:id`: Actualizar datos.
+*   `DELETE /users/:id`: Eliminar cuenta.
+
+#### Mensajería (`/messages`)
+*   `POST /messages`: **Endpoint Principal**.
+    *   Recibe: `chatId`, `contenido`.
+    *   **Proceso**: Guarda mensaje usuario -> Analiza con IA -> Guarda respuesta Bot -> Actualiza Chat.
+
+#### Chats (`/wise-chat`)
+*   `POST /wise-chat`: Crear una nueva sesión de chat.
+*   `GET /wise-chat/:id`: Obtener historial de conversación y estado emocional actual.
+
+## 💾 Modelo de Datos (PostgreSQL)
+
+El sistema utiliza **TypeORM** con las siguientes entidades clave:
+
+*   **User**:
+    *   Relación `1:N` con `Message` y `Notification`.
+    *   Relación `1:1` con `Historial`.
+*   **WiseChat**:
+    *   Contenedor de la conversación. Almacena métricas agregadas (`sentimiento_general`).
+    *   Relación `1:N` con `Message`.
+*   **Message**:
+    *   Almacena metadatos de IA: `sentimiento`, `nivel_urgencia`, `puntaje_urgencia`, `isBot`.
+
+## 🚀 Instalación y Configuración
+
+### Prerrequisitos
+*   Node.js v18+
+*   PostgreSQL
+
+### Pasos
+1.  **Clonar y Dependencias**
+    ```bash
+    git clone <repo-url>
+    cd MindConnectAI
+    npm install
+    ```
+
+2.  **Configurar Entorno (.env)**
+    Crea un archivo `.env` en la raíz:
+    ```env
+    PORT=3000
+    
+    # Base de Datos
+    DB_HOST=localhost
+    DB_PORT=5432
+    DB_USERNAME=postgres
+    DB_PASSWORD=tu_password
+    DB_NAME=mindconnect_db
+    
+    # Auth
+    JWT_SECRET=secreto_para_firmar_tokens
+    
+    # Email (Gmail SMTP Example)
+    MAIL_USER=tu_correo@gmail.com
+    MAIL_PASS=tu_contraseña_aplicacion
+    MAIL_FROM="MindConnect AI <no-reply@mindconnect.ai>"
+    
+    # Claves de API para IA (según proveedor usado en IaService)
+    # OPENAI_API_KEY=...
+    # GROQ_API_KEY=...
+    ```
+
+3.  **Ejecutar**
+    ```bash
+    # Modo desarrollo
+    npm run start:dev
+    ```
+
+## 🐳 Despliegue con Docker
+
+Este proyecto incluye configuración completa para Docker, lo que facilita el despliegue en cualquier entorno (Railway, AWS, DigitalOcean, Local).
+
+### Ejecutar con Docker Compose (Recomendado para Dev/Test)
+
+1.  Asegúrate de tener Docker instalado.
+2.  Ejecuta el comando:
+    ```bash
+    docker-compose up --build
+    ```
+3.  Esto levantará:
+    *   **PostgreSQL** en el puerto `5432`.
+    *   **MindConnect API** en el puerto `3000`.
+
+### Despliegue en Producción
+
+📖 **Guía completa y detallada**: Ver [DEPLOY.md](./DEPLOY.md) para instrucciones paso a paso de Railway, Render y VPS.
+
+#### Opción 1: Railway (Recomendado)
+
+#### Paso 1: Preparar el Repositorio
 ```bash
-$ npm install
+# Asegúrate de que todos los archivos estén commitados
+git add .
+git commit -m "Preparar para despliegue"
+git push origin main
 ```
 
-## Compile and run the project
+#### Paso 2: Desplegar en Railway
 
-```bash
-# development
-$ npm run start
+1.  **Crear cuenta en Railway**: Ve a [railway.app](https://railway.app) y crea una cuenta (puedes usar GitHub para autenticarte).
 
-# watch mode
-$ npm run start:dev
+2.  **Nuevo Proyecto**:
+    *   Haz clic en "New Project"
+    *   Selecciona "Deploy from GitHub repo"
+    *   Conecta tu repositorio y selecciona `MindConnectAI`
 
-# production mode
-$ npm run start:prod
-```
+3.  **Configurar Base de Datos**:
+    *   En el dashboard, haz clic en "New" → "Database" → "PostgreSQL"
+    *   Railway creará automáticamente las variables de entorno de conexión
 
-## Run tests
+4.  **Configurar Variables de Entorno**:
+    *   Ve a tu servicio de API → "Variables"
+    *   Railway ya habrá añadido las variables de BD (`DATABASE_URL`, `PGHOST`, etc.)
+    *   **Añade manualmente**:
+        ```
+        DB_HOST=${PGHOST}
+        DB_PORT=${PGPORT}
+        DB_USERNAME=${PGUSER}
+        DB_PASSWORD=${PGPASSWORD}
+        DB_NAME=${PGDATABASE}
+        JWT_SECRET=tu_secreto_super_seguro_aqui
+        MAIL_USER=tu_email@gmail.com
+        MAIL_PASS=tu_app_password
+        MAIL_FROM="MindConnect AI <no-reply@mindconnect.ai>"
+        OPENAI_API_KEY=sk-... (si usas OpenAI)
+        ```
 
-```bash
-# unit tests
-$ npm run test
+5.  **Configurar el Build**:
+    *   Railway detectará automáticamente el `Dockerfile`
+    *   Si no lo detecta, ve a "Settings" → "Build Command": `docker build -t app .`
+    *   "Start Command": `node dist/main`
 
-# e2e tests
-$ npm run test:e2e
+6.  **Desplegar**:
+    *   Railway comenzará a construir y desplegar automáticamente
+    *   Una vez terminado, te dará una URL pública (ej: `https://mindconnect-production.up.railway.app`)
 
-# test coverage
-$ npm run test:cov
-```
+#### Paso 3: Verificar el Despliegue
+*   Visita la URL proporcionada por Railway
+*   Prueba los endpoints de tu API
+*   Revisa los logs en el dashboard de Railway si hay problemas
 
-## Deployment
+### Alternativa: Render.com
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+1.  Crea cuenta en [render.com](https://render.com)
+2.  "New Web Service" → Conecta tu repo
+3.  Build Command: `npm install && npm run build`
+4.  Start Command: `npm run start:prod`
+5.  Crea una base de datos PostgreSQL separada y configura las variables de entorno
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
-=======
-# MindConnectAI
->>>>>>> 1ccbbea12afadcc1ca6cf8ca1e13d6aba3c096a1
+## 🧪 Testing
+*   Unitario: `npm run test`
+*   E2E: `npm run test:e2e`

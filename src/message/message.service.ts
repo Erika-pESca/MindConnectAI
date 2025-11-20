@@ -46,58 +46,66 @@ export class MessageService {
 
     this.logger.log(`📝 Creando mensaje para Chat ID: ${chatId}, User ID: ${userId}`);
 
-    // 3. Analizar sentimiento y generar respuesta con IA en un solo paso
-    const iaResult: IaResponse =
-      await this.iaService.generarRespuestaYAnalisis(contenido);
+    // 3. Analizar sentimiento con IA
+    const analisis: IaResponse = await this.iaService.analizarSentimiento(contenido);
 
     // 4. Crear mensaje del usuario
     const mensajeUsuario = this.messageRepo.create({
       content: contenido,
       status: EstadoMensaje.ENVIADO,
       wiseChat: chat,
-      user: user, // Usar la entidad de usuario completa
+      user: user,
 
-      sentimiento: iaResult.sentimiento,
-      nivel_urgencia: iaResult.nivel_urgencia,
-      puntaje_urgencia: iaResult.puntaje_urgencia,
+      sentimiento: analisis.sentimiento,
+      nivel_urgencia: analisis.nivel_urgencia,
+      puntaje_urgencia: analisis.puntaje_urgencia,
 
       isBot: false,
-      alerta_disparada: iaResult.puntaje_urgencia >= 3,
-      emoji_reaccion: iaResult.emoji_reaccion ?? null,
+      alerta_disparada: analisis.puntaje_urgencia >= 3,
+      emoji_reaccion: analisis.emoji_reaccion,
     });
 
-    await this.messageRepo.save(mensajeUsuario);
+    const mensajeUsuarioGuardado = await this.messageRepo.save(mensajeUsuario);
 
-    // 5. Crear mensaje del BOT con la respuesta generada
+    // 5. Generar respuesta IA
+    const respuestaBot: IaResponse = await this.iaService.generarRespuesta(
+      contenido,
+      analisis,
+    );
+
+    // 6. Crear mensaje del BOT con la respuesta generada
     const mensajeBot = this.messageRepo.create({
-      content: iaResult.respuesta,
+      content: respuestaBot.respuesta,
       status: EstadoMensaje.ENVIADO,
       wiseChat: chat,
       user: null,
 
-      sentimiento: Sentimiento.NEUTRAL, // El sentimiento del bot es neutral
+      sentimiento: Sentimiento.NEUTRAL,
       nivel_urgencia: NivelUrgencia.BAJA,
       puntaje_urgencia: 0,
 
       isBot: true,
       alerta_disparada: false,
-      emoji_reaccion: null,
     });
 
-    await this.messageRepo.save(mensajeBot);
+    const mensajeBotGuardado = await this.messageRepo.save(mensajeBot);
 
     // Log para verificar que se envió la respuesta
-    this.logger.log(
-      `✅ Respuesta del bot enviada al usuario ${userId} en chat ${chatId}. ID Msj Usuario: ${mensajeUsuario.id}, ID Msj Bot: ${mensajeBot.id}`,
-    );
+    // TypeScript puede inferir incorrectamente el tipo, así que verificamos que sean arrays
+    const usuarioId = Array.isArray(mensajeUsuarioGuardado) 
+      ? mensajeUsuarioGuardado[0]?.id 
+      : mensajeUsuarioGuardado.id;
+    const botId = Array.isArray(mensajeBotGuardado) 
+      ? mensajeBotGuardado[0]?.id 
+      : mensajeBotGuardado.id;
     
-    // Verificar si se guardó la relación
-    // const verify = await this.messageRepo.findOne({ where: { id: mensajeUsuario.id }, relations: ['wiseChat'] });
-    // this.logger.debug(`🔍 Verificación post-save: Chat ID en mensaje: ${verify?.wiseChat?.id}`);
+    this.logger.log(
+      `✅ Respuesta del bot enviada al usuario ${userId} en chat ${chatId}. ID Msj Usuario: ${usuarioId}, ID Msj Bot: ${botId}`,
+    );
 
-    // 6. Actualizar sentimiento global del chat
-    chat.sentimiento_general = String(iaResult.sentimiento);
-    chat.nivel_urgencia_general = String(iaResult.nivel_urgencia);
+    // 7. Actualizar sentimiento global del chat
+    chat.sentimiento_general = String(analisis.sentimiento);
+    chat.nivel_urgencia_general = String(analisis.nivel_urgencia);
 
     // IMPORTANTE: No guardar 'chat' con sus relaciones aquí si no queremos sobrescribir messages
     // TypeORM a veces borra relaciones OneToMany si no se cargan completas y se guarda el padre con cascade: true
@@ -108,10 +116,18 @@ export class MessageService {
       nivel_urgencia_general: chat.nivel_urgencia_general
     });
 
+    // Asegurar que retornamos entidades individuales, no arrays
+    const usuarioFinal = Array.isArray(mensajeUsuarioGuardado) 
+      ? mensajeUsuarioGuardado[0] 
+      : mensajeUsuarioGuardado;
+    const botFinal = Array.isArray(mensajeBotGuardado) 
+      ? mensajeBotGuardado[0] 
+      : mensajeBotGuardado;
+
     return {
       ok: true,
-      mensajeUsuario,
-      mensajeBot,
+      mensajeUsuario: usuarioFinal,
+      mensajeBot: botFinal,
       chatActualizado: chat,
     };
   }
