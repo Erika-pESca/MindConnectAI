@@ -346,7 +346,8 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        const API_URL = 'http://localhost:3000';
+        // Usar URL relativa para que funcione en cualquier dominio
+        const API_URL = window.location.origin;
 
         // Componente de Mensaje
         function Message({ message, isBot }) {
@@ -360,7 +361,7 @@
                     <div className="message-avatar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                         {isBot ? (
                             <img 
-                                src="http://localhost:3000/assets/imagotipo.png" 
+                                src="/assets/imagotipo.png" 
                                 alt="Bot" 
                                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                                 onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.textContent = '🤖'; }}
@@ -656,7 +657,7 @@
                 const storedToken = localStorage.getItem('token');
                 if (!storedToken) {
                     // Redirigir al login de frontend si no hay token usando la URL completa del servidor
-                    window.location.href = 'http://localhost:3000/index.html';
+                    window.location.href = '/index.html';
                 }
             }, []);
 
@@ -674,7 +675,7 @@
                         <div className="chat-header">
                             <h1 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                 <img 
-                                    src="http://localhost:3000/assets/imagotipo.png" 
+                                    src="/assets/imagotipo.png" 
                                     alt="MindConnect AI" 
                                     style={{ width: '48px', height: '48px', objectFit: 'contain' }}
                                     onError={(e) => { e.target.style.display = 'none'; }}
@@ -695,7 +696,7 @@
                         <div>
                             <h1 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                 <img 
-                                    src="http://localhost:3000/assets/imagotipo.png" 
+                                    src="/assets/imagotipo.png" 
                                     alt="MindConnect AI" 
                                     style={{ width: '48px', height: '48px', objectFit: 'contain' }}
                                     onError={(e) => { e.target.style.display = 'none'; }}
@@ -765,7 +766,7 @@
                                     <div className="message bot">
                                         <div className="message-avatar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                                             <img 
-                                                src="http://localhost:3000/assets/imagotipo.png" 
+                                                src="/assets/imagotipo.png" 
                                                 alt="Bot" 
                                                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                                                 onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.textContent = '🤖'; }}

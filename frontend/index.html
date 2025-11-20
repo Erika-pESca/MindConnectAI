@@ -540,7 +540,7 @@
         if (!emailVal) { forgotError.textContent = 'Introduce tu email.'; return }
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) { forgotError.textContent = 'Introduce un email válido.'; return }
         try {
-          const res = await fetch('http://localhost:3000/auth/forgot-password', {
+          const res = await fetch('/auth/forgot-password', {
             method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: emailVal })
           });
           const data = await res.json();
@@ -590,7 +590,7 @@
         if (!terms) return showMessage('registerMessage', 'Debes aceptar los términos y el tratamiento de datos para registrarte.');
 
         try {
-          const res = await fetch('http://localhost:3000/auth/register', {
+          const res = await fetch('/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password }),
@@ -632,7 +632,7 @@
         if (!password || password.length < 6) return showMessage('loginMessage', 'Contraseña inválida.');
 
         try {
-          const res = await fetch('http://localhost:3000/auth/login', {
+          const res = await fetch('/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, password }),
@@ -642,8 +642,8 @@
 
           localStorage.setItem('token', data.token);
           localStorage.setItem('user', JSON.stringify(data.user));
-          // Redirigir al chat usando la URL completa del servidor
-          window.location.href = 'http://localhost:3000/chat-frontend/chat.html';
+          // Redirigir al chat usando URL relativa
+          window.location.href = '/chat-frontend/chat.html';
         } catch (err) {
           console.error(err);
           showMessage('loginMessage', 'Error de red. Intenta de nuevo.');
