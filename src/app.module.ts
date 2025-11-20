@@ -33,16 +33,26 @@ import { join } from 'path';
     }),
 
     // Config BD
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT ?? '5432', 10),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      entities: [User, Message, WiseChat, Historial, Notification],
-      synchronize: true,
-    }),
+    TypeOrmModule.forRoot(
+      process.env.DATABASE_URL
+        ? {
+            type: 'postgres',
+            url: process.env.DATABASE_URL,
+            entities: [User, Message, WiseChat, Historial, Notification],
+            synchronize: true,
+            ssl: process.env.DATABASE_URL?.includes('sslmode=require') ? { rejectUnauthorized: false } : false,
+          }
+        : {
+            type: 'postgres',
+            host: process.env.DB_HOST,
+            port: parseInt(process.env.DB_PORT ?? '5432', 10),
+            username: process.env.DB_USERNAME,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_NAME,
+            entities: [User, Message, WiseChat, Historial, Notification],
+            synchronize: true,
+          },
+    ),
 
     // 📌 Módulos funcionales
     AuthModule,
