@@ -1,102 +1,213 @@
-<<<<<<< HEAD
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# **MindConnect AI**
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API REST con chat en tiempo real que permite interactuar con una IA, procesar análisis de sentimientos con modelos de Hugging Face, crear y gestionar chats, consultar historiales y manejar roles de usuario. Incluye colas, WebSockets, documentación automática y un entorno listo para despliegue.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+## **Características**
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+* Chat en tiempo real con WebSockets.
+* Análisis de sentimientos con IA externa.
+* Gestión completa de chats + historial.
+* Sistema de usuarios con roles.
+* Colas de procesamiento con BullMQ.
+* Envío de correos y alertas.
+* Documentación automática con Swagger y Compodoc.
+* Despliegue sencillo en Vercel o Docker.
 
-## Project setup
 
-```bash
-$ npm install
-```
+## **Tecnologías (¿para qué sirve cada una?)**
 
-## Compile and run the project
+### **Backend**
 
-```bash
-# development
-$ npm run start
+* **NestJS** → Estructura modular para mantener el backend organizado.
+* **TypeORM** → Manejo de entidades, migraciones y consultas SQL.
+* **PostgreSQL** → Base de datos para usuarios, chats e historiales.
+* **Redis** → Cache y soporte para colas y eventos en tiempo real.
+* **BullMQ** → Procesamiento de tareas en segundo plano.
+* **WebSockets (Socket.io)** → Comunicación bidireccional para el chat.
+* **JWT** → Autenticación segura con tokens.
+* **Mailo** → Envío de correos automáticos.
+* **Swagger** → Documentación automática de endpoints.
+* **Compodoc** → Documentación del código con diagramas.
+* **Docker** → Entorno replicable para backend y servicios.
 
-# watch mode
-$ npm run start:dev
+### **Frontend**
 
-# production mode
-$ npm run start:prod
-```
+* HTML · Tailwind · Librerías UI
+  → Interfaz ligera y rápida para la experiencia del chat.
 
-## Run tests
+### **Despliegue**
 
-```bash
-# unit tests
-$ npm run test
+* **Vercel** → Hosting del frontend.
+* **Docker** → Despliegue completo del backend con PostgreSQL y Redis.
 
-# e2e tests
-$ npm run test:e2e
 
-# test coverage
-$ npm run test:cov
-```
 
-## Deployment
+## **Instalación y Configuración (Backend)**
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### **Dependencias base**
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm install
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## **TypeORM + PostgreSQL**
 
-## Resources
+```bash
+npm install @nestjs/typeorm typeorm pg
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+## **Redis**
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+npm install redis
+```
 
-## Support
+**Levantar Redis:**
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+docker run -d --name redis -p 6379:6379 redis
+```
 
-## Stay in touch
+## **BullMQ**
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+npm install bullmq @nestjs/bullmq
+```
 
-## License
+**Crear job/worker:**
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
-=======
-# MindConnectAI
->>>>>>> 1ccbbea12afadcc1ca6cf8ca1e13d6aba3c096a1
+```bash
+npx nest g service modules/alerts/queue/jobs
+```
+
+**Ejecutar workers:**
+
+```bash
+npm run start:queues
+```
+
+
+## **WebSockets**
+
+```bash
+npm install @nestjs/websockets @nestjs/platform-socket.io
+```
+
+
+## **JWT**
+
+```bash
+npm install @nestjs/jwt jsonwebtoken bcrypt
+npm install --save-dev @types/jsonwebtoken
+```
+
+**Hash rápido:**
+
+```bash
+node -e "console.log(require('bcrypt').hashSync('password', 10))"
+```
+
+
+## **Swagger**
+
+Instalar:
+
+```bash
+npm install --save @nestjs/swagger swagger-ui-express
+```
+
+Activar en `main.ts`:
+
+```typescript
+const config = new DocumentBuilder()
+  .setTitle('MindConnect API')
+  .setDescription('Documentación de endpoints')
+  .setVersion('1.0')
+  .build();
+
+const document = SwaggerModule.createDocument(app, config);
+SwaggerModule.setup('api', app, document);
+```
+
+
+## **Compodoc**
+
+Instalar:
+
+```bash
+npm install -g @compodoc/compodoc
+```
+
+Generar docs:
+
+```bash
+compodoc -p tsconfig.json -s
+```
+
+
+## **Docker (entorno completo)**
+
+**Levantar backend + PostgreSQL + Redis:**
+
+```bash
+docker compose up --build -d
+```
+
+**Detener:**
+
+```bash
+docker compose down
+```
+
+
+## **Despliegue con Vercel**
+
+**Instalar CLI:**
+
+```bash
+npm install -g vercel
+```
+
+**Login:**
+
+```bash
+vercel login
+```
+
+**Desplegar:**
+
+```bash
+vercel --prod
+```
+
+
+## **Iniciar el proyecto local**
+
+```bash
+npm run start
+```
+
+
+## **Estructura del Proyecto**
+
+```
+src/
+│
+├─ modules/
+│   ├─ user/          → Usuarios y entidades
+│   ├─ auth/          → JWT, autenticación, estrategias
+│   ├─ wise-chat/     → Chat con IA y análisis de sentimientos
+│   ├─ historial/     → Historial de chats
+│   └─ alerts/        → Notificaciones, WebSockets y BullMQ
+│       ├─ gateways/  → Comunicación en tiempo real
+│       └─ queue/     → Jobs, colas y workers
+│
+├─ common/            → Decoradores, filtros, helpers
+├─ config/            → BD, variables de entorno y módulos globales
+└─ main.ts            → Entrada de la aplicación
+```
+
+## Autores
+
+Equipo de desarrollo de **MindConnect AI**.
