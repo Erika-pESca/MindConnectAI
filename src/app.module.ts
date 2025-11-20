@@ -71,5 +71,18 @@ export class AppModule {
     console.log(
       '➡️ Configuración cargada. Intentando conectar a la base de datos...',
     );
+    
+    // Debug: Verificar variables de entorno (sin mostrar valores sensibles)
+    console.log('🔍 Variables de entorno de BD:');
+    console.log(`  DATABASE_URL: ${process.env.DATABASE_URL ? '✅ Configurada' : '❌ No configurada'}`);
+    console.log(`  DB_HOST: ${process.env.DB_HOST || '❌ No configurada'}`);
+    console.log(`  DB_PORT: ${process.env.DB_PORT || '❌ No configurada'}`);
+    console.log(`  DB_USERNAME: ${process.env.DB_USERNAME ? '✅ Configurada' : '❌ No configurada'}`);
+    console.log(`  DB_NAME: ${process.env.DB_NAME || '❌ No configurada'}`);
+    
+    if (!process.env.DATABASE_URL && !process.env.DB_HOST) {
+      console.error('⚠️ ADVERTENCIA: No se encontraron variables de conexión a la base de datos!');
+      console.error('   Configura DATABASE_URL o DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME');
+    }
   }
 }
