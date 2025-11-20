@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { Historial } from '../../historial/entities/historial.entity';
 import { Message } from '../../message/entities/message.entity';
-import { Notification } from '../../notification/entities/notification.entity';
+import { Notification } from '../../notification/entities/notification.entity'; // <-- FALTA ESTA
 
 @Entity()
 export class WiseChat {
@@ -16,12 +16,11 @@ export class WiseChat {
   id: number;
 
   @Column({ length: 150 })
-  name: string; // nombre o título del chat
+  name: string;
 
   @Column({ type: 'text', nullable: true })
   description?: string;
 
-  // Campo donde guardas el resultado del análisis por chat
   @Column({ nullable: true })
   sentiment?: string;
 
@@ -31,13 +30,12 @@ export class WiseChat {
   @CreateDateColumn()
   creation_date: Date;
 
-  // Pertenece a un historial (Many WiseChat -> 1 Historial)
   @ManyToOne(() => Historial, (historial) => historial.wiseChats, { onDelete: 'CASCADE' })
   historial: Historial;
 
-  @OneToMany(() => Message, (message) => message.wiseChat)
+  @OneToMany(() => Message, (message) => message.wiseChat, { cascade: true })
   messages: Message[];
 
-  @OneToMany(() => Notification, (notification) => notification.wiseChat)
+  @OneToMany(() => Notification, (notification) => notification.wiseChat, { cascade: true })
   notifications: Notification[];
 }

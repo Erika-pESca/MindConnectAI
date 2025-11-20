@@ -6,6 +6,7 @@ import { WiseChat } from '../wise-chat/entities/wise-chat.entity';
 import { Message } from '../message/entities/message.entity';
 import { Historial } from '../historial/entities/historial.entity';
 import { firstValueFrom } from 'rxjs';
+import { NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class WiseChatService {
@@ -46,22 +47,27 @@ export class WiseChatService {
     const sentiment = response.data[0]?.label || 'UNKNOWN';
 
     // Guardar en historial
-    const historial = this.historialRepo.create({
-      user: { id: userId },
-      wiseChat: { id: wiseChatId },
-      content_message: content,
-      sentiment,
-      urgency_level: sentiment === 'NEGATIVE' ? 'alta' : 'normal',
-    });
-    await this.historialRepo.save(historial);
+   // Guardar en historial
+const historial = this.historialRepo.create({
+  user: { id: userId },
+  wiseChats: [{ id: wiseChatId }],
+});
 
-    return { message: 'Mensaje procesado', sentiment };
+await this.historialRepo.save(historial);
+
+return { message: 'Mensaje procesado', sentiment };
+
   }
 
   async getChatHistory(wiseChatId: number) {
-    return this.historialRepo.find({
-      where: { wiseChat: { id: wiseChatId } },
-      relations: ['user'],
-    });
+  const chat = await this.wiseChatRepo.findOne({
+    where: { id: wiseChatId },
+    relations: ['historial', 'historial.user'],
+  });
+  if (!chat) {
+    throw new NotFoundException(`Chat con id ${wiseChatId} no encontrado`);
   }
+
+  return chat.historial;
+}
 }
