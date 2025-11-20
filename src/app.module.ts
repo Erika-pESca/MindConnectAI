@@ -8,6 +8,9 @@ import { WiseChat } from './wise-chat/entities/wise-chat.entity';
 import { Historial } from './historial/entities/historial.entity';
 import { Notification } from './notification/entities/notification.entity';
 
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { WiseChatModule } from './wise-chat/wise-chat.module';
@@ -20,6 +23,8 @@ import { IaModule } from './ia/ia.module'; // 👈 IMPORTANTE
 import { join } from 'path';
 
 @Module({
+  controllers: [AppController],
+  providers: [AppService],
   imports: [
     // Cargar .env
     ConfigModule.forRoot({

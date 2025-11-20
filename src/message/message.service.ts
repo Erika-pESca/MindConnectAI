@@ -50,11 +50,11 @@ export class MessageService {
     const analisis: IaResponse = await this.iaService.analizarSentimiento(contenido);
 
     // 4. Crear mensaje del usuario
-    const mensajeUsuario = this.messageRepo.create({
+    const mensajeUsuarioData: any = {
       content: contenido,
       status: EstadoMensaje.ENVIADO,
       wiseChat: chat,
-      user: user, // Usar la entidad de usuario completa
+      user: user,
 
       sentimiento: analisis.sentimiento,
       nivel_urgencia: analisis.nivel_urgencia,
@@ -62,8 +62,13 @@ export class MessageService {
 
       isBot: false,
       alerta_disparada: analisis.puntaje_urgencia >= 3,
-      emoji_reaccion: analisis.emoji_reaccion ?? null,
-    });
+    };
+
+    if (analisis.emoji_reaccion) {
+      mensajeUsuarioData.emoji_reaccion = analisis.emoji_reaccion;
+    }
+
+    const mensajeUsuario = this.messageRepo.create(mensajeUsuarioData);
 
     await this.messageRepo.save(mensajeUsuario);
 
@@ -86,7 +91,6 @@ export class MessageService {
 
       isBot: true,
       alerta_disparada: false,
-      emoji_reaccion: null,
     });
 
     await this.messageRepo.save(mensajeBot);
