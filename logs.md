@@ -1,0 +1,1 @@
+JWT_ADMIN is not defined

@@ -11,11 +11,21 @@ export class RolesGuard implements CanActivate {
       ROLES_KEY,
       [context.getHandler(), context.getClass()],
     );
+
+    // Si la ruta no tiene decorador @Roles(), permite acceso
     if (!requiredRoles) {
-      return true; // If no roles are required, allow access
+      return true;
     }
+
+    // Usuario inyectado desde JwtStrategy → req.user
     const { user } = context.switchToHttp().getRequest();
-    // Assuming the user object has a 'role' property
-    return requiredRoles.some((role) => user.role?.includes(role));
+
+    if (!user || !user.role) {
+      return false;
+    }
+
+    // VALIDACIÓN CORRECTA:
+    // Retorna TRUE si el rol del usuario coincide con alguno requerido
+    return requiredRoles.includes(user.role);
   }
 }

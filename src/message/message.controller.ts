@@ -1,34 +1,48 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { MessageService } from './message.service';
-import { CreateMessageDto } from './dto/create-message.dto';
-import { UpdateMessageDto } from './dto/update-message.dto';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Param,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 
-@Controller('message')
+import type { Request } from 'express';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+
+import { CreateMessageDto } from './dto/create-message.dto';
+import { MessageService } from './message.service';
+
+@Controller('messages')
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createMessageDto: CreateMessageDto) {
-    return this.messageService.create(createMessageDto);
+  async crearMensaje(@Body() dto: CreateMessageDto, @Req() req: Request) {
+    const userId = (req as any).user.id; // viene del JWT
+
+    return await this.messageService.crearMensaje(
+      userId,
+      Number(dto.chatId), // conversión segura
+      dto.contenido,
+    );
   }
 
-  @Get()
-  findAll() {
-    return this.messageService.findAll();
+  /**
+   * Obtener todos los mensajes de un chat
+   */
+  @Get('chat/:chatId')
+  async obtenerMensajesPorChat(@Param('chatId') chatId: string) {
+    return await this.messageService.obtenerMensajesPorChat(Number(chatId));
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.messageService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMessageDto: UpdateMessageDto) {
-    return this.messageService.update(+id, updateMessageDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.messageService.remove(+id);
+  /**
+   * Verificar si hay respuestas del bot en un chat
+   */
+  @Get('chat/:chatId/bot-status')
+  async verificarRespuestasBot(@Param('chatId') chatId: string) {
+    return await this.messageService.verificarRespuestasBot(Number(chatId));
   }
 }

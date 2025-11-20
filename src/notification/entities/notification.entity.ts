@@ -13,7 +13,9 @@ export class Notification {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => WiseChat, (wiseChat) => wiseChat.notifications, { onDelete: 'CASCADE' })
+  @ManyToOne(() => WiseChat, (wiseChat) => wiseChat.notifications, {
+    onDelete: 'CASCADE',
+  })
   wiseChat: WiseChat;
 
   @ManyToOne(() => User, (user) => user.notifications, { onDelete: 'CASCADE' })

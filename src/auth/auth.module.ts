@@ -1,47 +1,55 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
+
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
+
 import { ConfigModule, ConfigService } from '@nestjs/config';
-// Use require() because '@nestjs-modules/mailer' does not provide TypeScript declarations
-// @ts-ignore: package does not provide TypeScript declarations
-const { MailerModule } = require('@nestjs-modules/mailer');
-import { join } from 'path';
-// @ts-ignore: package does not provide TypeScript declarations for the adapter path
-const { HandlebarsAdapter } = require('@nestjs-modules/mailer/dist/adapters/handlebars.adapter');
-import { UserModule } from '../user/user.module'; // Import UserModule
+
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+
+import { User } from '../user/entities/user.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+import * as path from 'path';
 
 @Module({
   imports: [
-    // If ConfigModule is not already global in your AppModule, you can set it here.
-    // Otherwise, you can remove this line if it's configured globally in app.module.ts
     ConfigModule.forRoot(),
-    UserModule, // Add UserModule to imports
+
+    // Necesario para poder inyectar el repositorio UserRepository
+    TypeOrmModule.forFeature([User]),
+
+    // JWT config
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
+      useFactory: (config: ConfigService) => ({
+        secret: config.get<string>('JWT_SECRET'),
         signOptions: { expiresIn: '1d' },
       }),
     }),
+
+    // Mailer config
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: (config: ConfigService) => ({
         transport: {
           service: 'gmail',
           auth: {
-            user: configService.get<string>('MAIL_USER'),
-            pass: configService.get<string>('MAIL_PASS'),
+            user: config.get<string>('MAIL_USER'),
+            pass: config.get<string>('MAIL_PASS'),
           },
         },
         defaults: {
-          from: configService.get<string>('MAIL_FROM'),
+          from: config.get<string>('MAIL_FROM'),
         },
         template: {
-          dir: join(__dirname, 'templates'),
+          // 👇 Ruta corregida
+          dir: path.join(process.cwd(), 'src', 'auth', 'templates'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,
@@ -50,8 +58,9 @@ import { UserModule } from '../user/user.module'; // Import UserModule
       }),
     }),
   ],
+
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
-  exports: [AuthService, JwtModule], // Export JwtModule to be used in other modules for guards
+  exports: [AuthService],
 })
 export class AuthModule {}
