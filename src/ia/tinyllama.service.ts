@@ -668,14 +668,14 @@ Responde como una persona real y empática:`;
     }
   }
 
-  private getEmoji(sentimiento: Sentimiento): string | null {
+  private getEmoji(sentimiento: Sentimiento): string | undefined {
     switch (sentimiento) {
       case Sentimiento.NEGATIVO:
         return '😢';
       case Sentimiento.POSITIVO:
         return '😊';
       default:
-        return null;
+        return undefined;
     }
   }
 

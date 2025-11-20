@@ -120,41 +120,57 @@ export class AuthService {
   // 🔹 ENVIAR CORREO DE RECUPERACIÓN
   // ------------------------
   async forgotPassword(dto: ForgotPasswordDto) {
-    const user = await this.userRepo.findOne({
-      where: { email: dto.email },
-    });
+    try {
+      const user = await this.userRepo.findOne({
+        where: { email: dto.email },
+      });
 
-    if (!user) throw new NotFoundException('Usuario no encontrado');
+      if (!user) throw new NotFoundException('Usuario no encontrado');
 
-    const token = this.jwtService.sign(
-      { email: user.email },
-      { expiresIn: '30m' },
-    );
+      const token = this.jwtService.sign(
+        { email: user.email },
+        { expiresIn: '30m' },
+      );
 
-    // Usar el endpoint del backend que redirige correctamente al frontend
-    // Usar URL absoluta para evitar problemas con variables de entorno
-    const backendUrl = 'http://localhost:3000';
-    const resetLink = `${backendUrl}/auth/reset-password?token=${encodeURIComponent(token)}`;
-    
-    // Log para depuración (remover en producción)
-    console.log('Reset link generado:', resetLink);
-    console.log('Logo disponible:', this.logoBase64 ? 'Sí (base64)' : 'No, usando URL fallback');
-    console.log('Logo length:', this.logoBase64 ? this.logoBase64.length : 0);
+      // Usar el endpoint del backend que redirige correctamente al frontend
+      // Usar URL absoluta para evitar problemas con variables de entorno
+      const backendUrl = 'http://localhost:3000';
+      const resetLink = `${backendUrl}/auth/reset-password?token=${encodeURIComponent(token)}`;
+      
+      // Log para depuración (remover en producción)
+      console.log('Reset link generado:', resetLink);
+      console.log('Logo disponible:', this.logoBase64 ? 'Sí (base64)' : 'No, usando URL fallback');
 
-    const logoUrl = this.logoBase64 || 'http://localhost:3000/assets/Logo-completo-fondo-blanco.png';
-    
-    await this.mailerService.sendMail({
-      to: user.email,
-      subject: 'Recuperación de contraseña',
-      template: './reset-password',
-      context: {
-        name: user.name,
-        resetLink: resetLink,
-        logoUrl: logoUrl,
-      },
-    });
+      const logoUrl = this.logoBase64 || 'http://localhost:3000/assets/Logo-completo-fondo-blanco.png';
+      
+      // Verificar que las credenciales de correo estén configuradas
+      const mailUser = this.configService.get<string>('MAIL_USER');
+      const mailPass = this.configService.get<string>('MAIL_PASS');
+      
+      if (!mailUser || !mailPass) {
+        console.error('❌ Variables de correo no configuradas (MAIL_USER, MAIL_PASS)');
+        throw new Error('Configuración de correo no disponible. Por favor, configura MAIL_USER y MAIL_PASS en las variables de entorno.');
+      }
+      
+      await this.mailerService.sendMail({
+        to: user.email,
+        subject: 'Recuperación de contraseña',
+        template: './reset-password',
+        context: {
+          name: user.name,
+          resetLink: resetLink,
+          logoUrl: logoUrl,
+        },
+      });
 
-    return { message: 'Correo enviado correctamente' };
+      return { message: 'Correo enviado correctamente' };
+    } catch (error) {
+      console.error('❌ Error al enviar correo de recuperación:', error);
+      throw new Error(
+        error.message || 
+        'Error al enviar el correo. Verifica la configuración de correo (MAIL_USER, MAIL_PASS) en las variables de entorno.'
+      );
+    }
   }
 
   // ------------------------

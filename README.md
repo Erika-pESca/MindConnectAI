@@ -133,7 +133,11 @@ Este proyecto incluye configuración completa para Docker, lo que facilita el de
     *   **PostgreSQL** en el puerto `5432`.
     *   **MindConnect API** en el puerto `3000`.
 
-### Despliegue en Producción (Railway - Recomendado)
+### Despliegue en Producción
+
+📖 **Guía completa y detallada**: Ver [DEPLOY.md](./DEPLOY.md) para instrucciones paso a paso de Railway, Render y VPS.
+
+#### Opción 1: Railway (Recomendado)
 
 #### Paso 1: Preparar el Repositorio
 ```bash

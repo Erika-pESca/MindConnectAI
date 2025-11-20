@@ -48,7 +48,9 @@ import * as path from 'path';
           from: config.get<string>('MAIL_FROM'),
         },
         template: {
-          // 👇 Ruta corregida
+          // Ruta que funciona tanto en desarrollo como en producción (Docker)
+          // En desarrollo: process.cwd() = /ruta/al/proyecto
+          // En producción: process.cwd() = /app
           dir: path.join(process.cwd(), 'src', 'auth', 'templates'),
           adapter: new HandlebarsAdapter(),
           options: {

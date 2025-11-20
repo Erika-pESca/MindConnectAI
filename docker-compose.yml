@@ -19,8 +19,15 @@ services:
       # Otras variables (Copia las de tu .env local si es necesario)
       - JWT_SECRET=secreto_para_desarrollo_local
       # Configura estas si vas a probar el envío de correos o IA desde el contenedor
-      # - MAIL_USER=...
-      # - MAIL_PASS=...
+      # IMPORTANTE: Para que funcione el "Olvidé mi contraseña", configura estas variables:
+      - MAIL_USER=epescaalfonso@gmail.com
+      - MAIL_PASS=csza ygjo xdgu pbed
+      - MAIL_FROM="Soporte Salud Mental <erika.pesca@gmail.com>"
+      # Si no las configuras, verás un error "Internal server error" al intentar recuperar contraseña
+      # Configuración de IA (Groq)
+      # IMPORTANTE: Agrega tu GROQ_API_KEY aquí para usar respuestas de IA avanzadas
+      # Obtén tu API key en: https://console.groq.com/
+      - GROQ_API_KEY=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
     depends_on:
       - db
     networks:

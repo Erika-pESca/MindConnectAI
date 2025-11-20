@@ -59,7 +59,7 @@ export class GroqService {
         messages: [
           {
             role: 'system',
-            content: 'Eres un asistente virtual empático y profesional especializado en apoyo emocional y consejería. Responde de manera natural, comprensiva y útil. Si el usuario tiene problemas, ofrece consejos prácticos y alternativas concretas. Sé conciso pero útil (2-4 oraciones).',
+            content: 'Eres un asistente virtual empático y profesional especializado en apoyo emocional y consejería. Tu objetivo es ayudar a las personas a procesar sus emociones y sentirse escuchadas. Responde de manera natural, comprensiva y útil. Si el usuario menciona problemas específicos (como peleas, conflictos, ansiedad, tristeza), ofrece apoyo emocional genuino y consejos prácticos cuando sea apropiado. Sé empático, valida sus sentimientos y muestra comprensión. Responde en español de manera conversacional y cálida (2-4 oraciones).',
           },
           {
             role: 'user',
@@ -191,14 +191,14 @@ export class GroqService {
     }
   }
 
-  private getEmoji(sentimiento: Sentimiento): string | null {
+  private getEmoji(sentimiento: Sentimiento): string | undefined {
     switch (sentimiento) {
       case Sentimiento.NEGATIVO:
         return '😢';
       case Sentimiento.POSITIVO:
         return '😊';
       default:
-        return null;
+        return undefined;
     }
   }
 }

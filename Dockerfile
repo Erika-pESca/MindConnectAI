@@ -31,6 +31,13 @@ RUN npm ci --only=production
 # Copy built assets from builder stage
 COPY --from=builder /app/dist ./dist
 
+# Copy frontend static files
+COPY frontend ./frontend
+COPY chat-frontend ./chat-frontend
+
+# Copy email templates (needed at runtime)
+COPY src/auth/templates ./src/auth/templates
+
 # Create cache directory for IA models
 ENV XENOVA_CACHE_DIR=/app/.cache
 RUN mkdir -p /app/.cache && chown -R node:node /app/.cache
