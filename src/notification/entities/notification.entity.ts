@@ -14,10 +14,16 @@ export class Notification {
   id: number;
 
   @ManyToOne(() => WiseChat, (wiseChat) => wiseChat.notifications, {
+<<<<<<< HEAD
   onDelete: 'CASCADE',
 })
 wiseChat: WiseChat;
 
+=======
+    onDelete: 'CASCADE',
+  })
+  wiseChat: WiseChat;
+>>>>>>> 34cf1efa500f9f9c7cd6ced6cc8070bb18c865fe
 
   @ManyToOne(() => User, (user) => user.notifications, { onDelete: 'CASCADE' })
   user: User;

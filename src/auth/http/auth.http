@@ -1,0 +1,63 @@
+### 1. Registro
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+  "name": "Erika",
+  "email": "epescaalfonso@gmail.com",
+  "password": "123456",
+  "role": "admin"
+}
+
+###
+
+### 2. Login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "email": "epescaalfonso@gmail.com",
+  "password": "123456"
+}
+
+###
+
+### GUARDAR TOKEN MANUALMENTE
+@token = PON_AQUI_EL_TOKEN_DEL_LOGIN
+
+###
+
+### 3. Obtener perfil (protegido)
+GET http://localhost:3000/user/profile
+Authorization: Bearer {{token}}
+
+###
+
+### 4. Forgot password
+POST http://localhost:3000/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "epescaalfonso@gmail.com"
+}
+
+###
+
+### RESET PASSWORD
+POST http://localhost:3000/auth/reset-password
+Content-Type: application/json
+
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVwZXNjYWFsZm9uc29AZ21haWwuY29tIiwiaWF0IjoxNzYzMjUyMTY1LCJleHAiOjE3NjMyNTM5NjV9.CqyPG8XXDPNAX1r-5aQSJhN-YTtVOInfveMgWuLfqM8",
+  "newPassword": "MiNuevaClaveSegura123"
+}
+
+POST http://localhost:3000/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "lasofidiaz484@gmail.com"
+}
+
+POST http://localhost:3000/auth/reset-password
+

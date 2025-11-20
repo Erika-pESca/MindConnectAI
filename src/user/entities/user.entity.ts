@@ -1,47 +1,48 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
   Column,
-  OneToOne,
+  PrimaryGeneratedColumn,
   OneToMany,
-  CreateDateColumn,
+  OneToOne,
 } from 'typeorm';
-import { Historial } from '../../historial/entities/historial.entity';
-import { Notification } from '../../notification/entities/notification.entity';
 import { Message } from '../../message/entities/message.entity';
+import { Notification } from '../../notification/entities/notification.entity';
+import { Historial } from '../../historial/entities/historial.entity';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 100 })
+  @Column()
   name: string;
 
-  @Column({ unique: true, length: 150 })
+  @Column({ unique: true })
   email: string;
 
   @Column()
   password: string;
 
-  @Column({ default: 'user' })
+  @Column({
+    type: 'varchar',
+    default: 'user',
+  })
   role: string;
 
-  @Column({ nullable: true })
-  profilePhoto?: string;
+  @Column({
+    type: 'timestamp',
+    nullable: true,
+  })
+  last_login: Date | null;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  // 👇👇 RELACIONES QUE TE HACÍAN FALTA
 
-  // 1:1 con Historial (cada usuario tiene un historial)
-  @OneToOne(() => Historial, (historial) => historial.user, { cascade: true })
+  @OneToOne(() => Historial, (historial) => historial.user)
   historial: Historial;
 
-  // 1:N con Notification (usuario puede tener muchas notificaciones)
-  @OneToMany(() => Notification, (notification) => notification.user)
-  notifications: Notification[];
-
-  // 1:N con Message (usuario puede enviar muchos mensajes)
   @OneToMany(() => Message, (message) => message.user)
   messages: Message[];
+
+  @OneToMany(() => Notification, (notification) => notification.user)
+  notifications: Notification[];
 }
