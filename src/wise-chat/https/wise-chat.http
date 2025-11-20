@@ -1,0 +1,20 @@
+### 🧠 Crear un nuevo chat
+POST http://localhost:3000/wisechat/create
+Content-Type: application/json
+
+{
+  "name": "Chat de apoyo emocional",
+  "description": "Chat IA que analiza sentimientos"
+}
+
+### 💬 Enviar mensaje y analizar sentimiento
+POST http://localhost:3000/wisechat/1/send
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "content": "Me siento un poco triste y sin ganas de nada"
+}
+
+### 📜 Obtener historial del chat
+GET http://localhost:3000/wisechat/1/history
