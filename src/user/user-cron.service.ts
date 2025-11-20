@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { Notification } from '../notification/entities/notification.entity';
 
-
 @Injectable()
 export class UserCronService {
   constructor(
@@ -21,7 +20,6 @@ export class UserCronService {
     const now = new Date();
 
     for (const user of users) {
-
       if (!user.last_login) continue;
 
       const diffMonths =
@@ -47,4 +45,3 @@ export class UserCronService {
     }
   }
 }
-

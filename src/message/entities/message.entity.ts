@@ -62,12 +62,6 @@ export class Message {
   @Column({ type: 'boolean', default: false })
   isBot: boolean;
 
-  @Column({ nullable: true })
-  user_id: number | null;
-
-  @Column()
-  wiseChat_id: number;
-
   // ----------------------------
   // 📌 Alertas y Sockets
   // ----------------------------
@@ -76,7 +70,7 @@ export class Message {
   alerta_disparada: boolean;
 
   @Column({ type: 'varchar', length: 10, nullable: true })
-  emoji_reaccion?: string;
+  emoji_reaccion: string | null;
 
   // ----------------------------
   // 📌 Relaciones

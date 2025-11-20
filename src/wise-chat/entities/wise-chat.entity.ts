@@ -22,7 +22,6 @@ export class WiseChat {
   @Column({ type: 'text', nullable: true })
   descripcion: string | null;
 
-
   /**
    * Resultado del análisis de sentimientos general del chat
    * Se actualiza automáticamente al crear mensajes nuevos.

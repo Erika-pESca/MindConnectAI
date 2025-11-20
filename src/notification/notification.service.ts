@@ -18,7 +18,9 @@ export class NotificationService {
     private readonly wiseChatRepository: Repository<WiseChat>,
   ) {}
 
-  async create(createNotificationDto: CreateNotificationDto): Promise<Notification> {
+  async create(
+    createNotificationDto: CreateNotificationDto,
+  ): Promise<Notification> {
     const { userId, wiseChatId, message } = createNotificationDto;
 
     const user = await this.userRepository.findOneBy({ id: userId });
@@ -26,7 +28,9 @@ export class NotificationService {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
-    const wiseChat = await this.wiseChatRepository.findOneBy({ id: wiseChatId });
+    const wiseChat = await this.wiseChatRepository.findOneBy({
+      id: wiseChatId,
+    });
     if (!wiseChat) {
       throw new NotFoundException(`WiseChat with ID ${wiseChatId} not found`);
     }
@@ -41,13 +45,15 @@ export class NotificationService {
   }
 
   findAll(): Promise<Notification[]> {
-    return this.notificationRepository.find({ relations: ['user', 'wiseChat'] });
+    return this.notificationRepository.find({
+      relations: ['user', 'wiseChat'],
+    });
   }
 
   async findOne(id: number): Promise<Notification> {
     const notification = await this.notificationRepository.findOne({
-        where: { id },
-        relations: ['user', 'wiseChat'],
+      where: { id },
+      relations: ['user', 'wiseChat'],
     });
     if (!notification) {
       throw new NotFoundException(`Notification with ID ${id} not found`);
@@ -55,17 +61,20 @@ export class NotificationService {
     return notification;
   }
 
-  async update(id: number, updateNotificationDto: UpdateNotificationDto): Promise<Notification> {
+  async update(
+    id: number,
+    updateNotificationDto: UpdateNotificationDto,
+  ): Promise<Notification> {
     const notification = await this.findOne(id);
-    
+
     // Update status if provided
     if (updateNotificationDto.status) {
-        notification.status = updateNotificationDto.status;
+      notification.status = updateNotificationDto.status;
     }
 
     // Update message if provided
     if (updateNotificationDto.message) {
-        notification.message = updateNotificationDto.message;
+      notification.message = updateNotificationDto.message;
     }
 
     return this.notificationRepository.save(notification);

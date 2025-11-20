@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, OneToOne, OneToMany, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { WiseChat } from '../../wise-chat/entities/wise-chat.entity';
 
@@ -11,6 +17,8 @@ export class Historial {
   @JoinColumn()
   user: User;
 
-  @OneToMany(() => WiseChat, (wiseChat) => wiseChat.historial, { cascade: true })
+  @OneToMany(() => WiseChat, (wiseChat) => wiseChat.historial, {
+    cascade: true,
+  })
   wiseChats: WiseChat[];
 }

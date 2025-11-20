@@ -1,6 +1,5 @@
 import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-
 export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
@@ -20,6 +19,5 @@ export class CreateUserDto {
   // 🔥 nuevo campo opcional
   @IsOptional()
   @IsString()
-  role?: string;   // 'user' o 'admin' o lo que uses
+  role?: string; // 'user' o 'admin' o lo que uses
 }
-

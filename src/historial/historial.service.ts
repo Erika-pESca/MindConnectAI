@@ -16,9 +16,13 @@ export class HistorialService {
   ) {}
 
   async create(createHistorialDto: CreateHistorialDto): Promise<Historial> {
-    const user = await this.userRepository.findOneBy({ id: createHistorialDto.userId });
+    const user = await this.userRepository.findOneBy({
+      id: createHistorialDto.userId,
+    });
     if (!user) {
-      throw new NotFoundException(`User with ID ${createHistorialDto.userId} not found`);
+      throw new NotFoundException(
+        `User with ID ${createHistorialDto.userId} not found`,
+      );
     }
 
     const newHistorial = this.historialRepository.create({ user });
@@ -40,7 +44,10 @@ export class HistorialService {
     return historial;
   }
 
-  async update(id: number, updateHistorialDto: UpdateHistorialDto): Promise<Historial> {
+  async update(
+    id: number,
+    updateHistorialDto: UpdateHistorialDto,
+  ): Promise<Historial> {
     // Since UpdateHistorialDto is currently empty, this method won't change anything.
     // It's structured to be easily expandable later.
     const historial = await this.findOne(id);

@@ -10,4 +10,3 @@ export class UpdateNotificationDto {
   @IsIn(['read', 'unread'])
   status?: 'read' | 'unread';
 }
-

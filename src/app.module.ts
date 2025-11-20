@@ -58,6 +58,8 @@ import { join } from 'path';
 })
 export class AppModule {
   constructor() {
-    console.log('➡️ Configuración cargada. Intentando conectar a la base de datos...');
+    console.log(
+      '➡️ Configuración cargada. Intentando conectar a la base de datos...',
+    );
   }
 }

@@ -52,3 +52,12 @@ Content-Type: application/json
   "newPassword": "MiNuevaClaveSegura123"
 }
 
+POST http://localhost:3000/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "lasofidiaz484@gmail.com"
+}
+
+POST http://localhost:3000/auth/reset-password
+
