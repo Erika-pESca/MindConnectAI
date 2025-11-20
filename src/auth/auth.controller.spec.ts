@@ -312,7 +312,7 @@ describe('AuthController', () => {
   });
 
   describe('getResetPassword', () => {
-    it('redirigir al frontend con el token correctamente', () => {
+    it('redirigir al frontend con el token en el hash (#)', () => {
       // Arrange
       const token = 'reset-token-123';
       const mockResponse = {
@@ -323,26 +323,9 @@ describe('AuthController', () => {
       controller.getResetPassword(token, mockResponse);
 
       // Assert
-      expect(mockConfigService.get).toHaveBeenCalledWith('FRONTEND_URL');
+      // Ya no verificamos ConfigService porque la URL está hardcodeada
       expect(mockResponse.redirect).toHaveBeenCalledWith(
-        'http://localhost:3000/reset-password.html?token=reset-token-123',
-      );
-    });
-
-    it('usar URL por defecto cuando FRONTEND_URL no está configurado', () => {
-      // Arrange
-      const token = 'reset-token-123';
-      const mockResponse = {
-        redirect: jest.fn().mockReturnThis(),
-      } as unknown as Response;
-      mockConfigService.get.mockReturnValue(undefined);
-
-      // Act
-      controller.getResetPassword(token, mockResponse);
-
-      // Assert
-      expect(mockResponse.redirect).toHaveBeenCalledWith(
-        'http://localhost:3000/reset-password.html?token=reset-token-123',
+        'http://localhost:3000/reset-password.html#token=reset-token-123',
       );
     });
 
@@ -360,22 +343,8 @@ describe('AuthController', () => {
       expect(mockResponse.redirect).toHaveBeenCalledWith(
         expect.stringContaining(encodeURIComponent(token)),
       );
-    });
-
-    it('remover barra final de FRONTEND_URL si existe', () => {
-      // Arrange
-      const token = 'reset-token-123';
-      const mockResponse = {
-        redirect: jest.fn().mockReturnThis(),
-      } as unknown as Response;
-      mockConfigService.get.mockReturnValue('http://localhost:3000/');
-
-      // Act
-      controller.getResetPassword(token, mockResponse);
-
-      // Assert
       expect(mockResponse.redirect).toHaveBeenCalledWith(
-        'http://localhost:3000/reset-password.html?token=reset-token-123',
+        expect.stringContaining('#token='),
       );
     });
   });

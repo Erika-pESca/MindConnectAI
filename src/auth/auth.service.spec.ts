@@ -328,7 +328,7 @@ describe('AuthService', () => {
     it('enviar correo de recuperación correctamente', async () => {
       // Arrange
       const token = 'reset-token-123';
-      const resetLink = `http://localhost:3000/reset-password.html?token=${token}`;
+      const resetLink = `http://localhost:3000/auth/reset-password?token=${encodeURIComponent(token)}`;
       mockUserRepository.findOne.mockResolvedValue(mockUser);
       mockJwtService.sign.mockReturnValue(token);
       mockMailerService.sendMail.mockResolvedValue(undefined);
@@ -349,10 +349,10 @@ describe('AuthService', () => {
         to: mockUser.email,
         subject: 'Recuperación de contraseña',
         template: './reset-password',
-        context: {
+        context: expect.objectContaining({
           name: mockUser.name,
           resetLink: resetLink,
-        },
+        }),
       });
       expect(result).toEqual({ message: 'Correo enviado correctamente' });
     });
@@ -395,7 +395,7 @@ describe('AuthService', () => {
     it('enviar correo con el link de reset correcto', async () => {
       // Arrange
       const token = 'reset-token-123';
-      const expectedResetLink = `http://localhost:3000/reset-password.html?token=${token}`;
+      const expectedResetLink = `http://localhost:3000/auth/reset-password?token=${encodeURIComponent(token)}`;
       mockUserRepository.findOne.mockResolvedValue(mockUser);
       mockJwtService.sign.mockReturnValue(token);
       mockMailerService.sendMail.mockResolvedValue(undefined);
