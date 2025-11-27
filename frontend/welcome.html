@@ -21,14 +21,26 @@
   </div>
 
   <script>
+    const token = localStorage.getItem('token');
     const userRaw = localStorage.getItem('user');
+    
+    // Si no hay token, redirigir al login
+    if (!token) {
+      window.location.href = 'index.html';
+    }
+    
     let name = '';
     if (userRaw) {
       try { const u = JSON.parse(userRaw); name = u.name || u.email || 'usuario'; }
       catch(e) { name = userRaw }
     }
     document.getElementById('welcomeTitle').innerText = `Bienvenido/a, ${name}!`;
-    document.getElementById('welcomeSubtitle').innerText = 'Has iniciado sesión correctamente.';
+    document.getElementById('welcomeSubtitle').innerText = 'Has iniciado sesión correctamente. Redirigiendo al chat...';
+
+    // Redirigir automáticamente al chat después de 2 segundos
+    setTimeout(() => {
+      window.location.href = '/chat-frontend/chat.html';
+    }, 2000);
 
     document.getElementById('btnLogout').addEventListener('click', ()=>{
       localStorage.removeItem('token');

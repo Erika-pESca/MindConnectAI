@@ -29,7 +29,7 @@ import { join } from 'path';
     // Cargar .env
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: join(__dirname, '..', '.env'),
+      envFilePath: ['.env'], // Buscar en la raíz de ejecución (MindConnectAI/)
     }),
 
     // Config BD

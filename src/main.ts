@@ -16,7 +16,13 @@ async function bootstrap() {
     // Esto servirá todos los archivos HTML, CSS, JS, imágenes, etc.
     app.useStaticAssets(frontendPath, {
       prefix: '/',
-      index: ['index.html'], // Permitir index.html como archivo por defecto
+      index: ['home.html', 'index.html'], // home.html como página principal, index.html como fallback
+    });
+    
+    // Ruta para servir home.html como página principal usando Express directamente
+    const express = app.getHttpAdapter().getInstance();
+    express.get('/', (req, res) => {
+      res.sendFile(join(frontendPath, 'home.html'));
     });
     
     // También servir la carpeta chat-frontend
@@ -40,10 +46,10 @@ async function bootstrap() {
     console.log(`📁 Frontend path: ${frontendPath}`);
     console.log(`🌐 Frontend disponible en http://localhost:${port}/`);
     console.log(`📡 Endpoints disponibles:`);
-    console.log(`   GET  / - Frontend (index.html)`);
+    console.log(`   GET  / - Frontend (home.html - Página principal)`);
+    console.log(`   GET  /home.html - Página principal`);
     console.log(`   GET  /index.html - Página de Login/Registro`);
-    console.log(`   GET  /chat.html - Chat`);
-    console.log(`   GET  /chat-frontend/chat.html - Chat (ruta completa)`);
+    console.log(`   GET  /chat-frontend/chat.html - Chat`);
     console.log(`   POST /auth/register - Registro`);
     console.log(`   POST /auth/login - Login`);
     console.log(`   POST /messages - Crear mensaje`);
