@@ -27,7 +27,7 @@ services:
       # Configuración de IA (Groq)
       # IMPORTANTE: Agrega tu GROQ_API_KEY aquí para usar respuestas de IA avanzadas
       # Obtén tu API key en: https://console.groq.com/
-      - GROQ_API_KEY=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
+      - GROQ_API_KEY=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
     depends_on:
       - db
     networks:
